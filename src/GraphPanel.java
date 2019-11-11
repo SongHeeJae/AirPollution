@@ -1,6 +1,6 @@
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -23,7 +23,7 @@ class Graph<T> {
 	}
 }
 
-public class GraphPanel extends JPanel implements MouseMotionListener{
+public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	
 	private String pol; // 오염물질 종류
 	private int x, y;
@@ -34,7 +34,6 @@ public class GraphPanel extends JPanel implements MouseMotionListener{
 	}
 	
 	public GraphPanel(String pol) {
-		setLayout(new FlowLayout());
 		setPreferredSize(new Dimension(950, 650));
 		addMouseMotionListener(this);
 		this.pol = pol;
@@ -72,14 +71,9 @@ public class GraphPanel extends JPanel implements MouseMotionListener{
 	}
 	
 	
-	public void addGraph(String place, String value) {
-	}
+	abstract public <T> void addGraph(String place, T value);
 	
-	public void addGraph(String place, List<Double> value) {
-	}
-	
-	public void setResize() {
-	}
+	abstract public void setResize();
 	
 	public void removeGraph(int pos) {
 	

@@ -7,13 +7,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class LineGraphPanel extends GraphPanel{
 
 	private List<Graph<List<Double>>> datas;
-	
 	public LineGraphPanel(String value) {
 		super(value);
 		datas = new ArrayList<>();
@@ -68,15 +69,16 @@ public class LineGraphPanel extends GraphPanel{
 		repaint();
 	}
 	
-	public void addGraph(String place, List<Double> value) {
-		
-		datas.add(new Graph<List<Double>>(place, value));
-		double m = value.stream().max(Double::compare).orElse(0.0);
+	public <T> void addGraph(String place, T value) {
+		List<Double> v = (List<Double>)value;
+		datas.add(new Graph<List<Double>>(place, v));
+		double m = v.stream().max(Double::compare).orElse(0.0);
 		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
 		setResize();
 		revalidate();
 		repaint();
 	}
+	
 	public void clear() {
 		super.clear();
 		datas.clear();

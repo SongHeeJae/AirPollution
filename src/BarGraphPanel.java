@@ -23,10 +23,11 @@ public class BarGraphPanel extends GraphPanel {
 		}
 	}
 	
-	public void addGraph(String place, String value) {
-		datas.add(new Graph<Double>(place, Double.parseDouble(value)));
+	public <T> void addGraph(String place, T value) {
+		String v = (String)value;
+		datas.add(new Graph<Double>(place, Double.parseDouble(v)));
 		
-		if(max <= Double.parseDouble(value)) max = Double.parseDouble(value)*2; // 현재 간격보다 최대치면 기준바꿔줌
+		if(max <= Double.parseDouble(v)) max = Double.parseDouble(v)*2; // 현재 간격보다 최대치면 기준바꿔줌
 		
 		setResize();
 		revalidate();

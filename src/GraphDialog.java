@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
@@ -56,44 +57,12 @@ public class GraphDialog extends JDialog {
 		duration.setText(datas.get(0).getData(0) + "~" + datas.get(datas.size() - 1).getData(0));
 		add(duration);
 		
-	/*	JSpinner dateStartSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
-		JSpinner dateEndSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
-		dateStartSpinner.setEditor(new JSpinner.DateEditor(dateStartSpinner, "yyyy-MM-dd"));
-		dateEndSpinner.setEditor(new JSpinner.DateEditor(dateEndSpinner, "yyyy-MM-dd"));*/
-		
-	//	add(dateStartSpinner);
-	//	add(dateEndSpinner);
-		
-	/*	JButton editDate = new JButton("적용");
-		editDate.addActionListener(e-> {
-			if(((JButton) e.getSource()).getText().equals("수정")) {
-				dateStartSpinner.setEnabled(true);
-				dateEndSpinner.setEnabled(true);
-				((JButton) e.getSource()).setText("적용");
-			} else {
-				dateStartSpinner.setEnabled(false);
-				dateEndSpinner.setEnabled(false);
-				((JButton) e.getSource()).setText("수정");
-				for(int i=0; i<gp.length; i++) gp[i].clear();
-				while(dtm.getRowCount() != 0) dtm.removeRow(dtm.getRowCount() - 1);
-			}
-		});*/
-	//	add(editDate);
-		
 		JTextField searchText = new JTextField(20);
 		add(searchText);
 		
 		
 		JButton dateSearch = new JButton("검색");
-		dateSearch.addActionListener(e -> {
-	/*		if(editDate.getText().equals("적용")) {
-				JOptionPane.showMessageDialog(null, "날짜를 적용해주세요.");
-				return;
-			}
-			String start = new SimpleDateFormat("yyyyMMdd").format(dateStartSpinner.getValue());
-			String end = new SimpleDateFormat("yyyyMMdd").format(dateEndSpinner.getValue());*/
-			addTableRow(searchText.getText());
-		});
+		dateSearch.addActionListener(e -> addTableRow(searchText.getText()));
 		add(dateSearch);
 		
 		dtm = new DefaultTableModel(header, 0) {
@@ -156,17 +125,6 @@ public class GraphDialog extends JDialog {
 		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		int[] count = {0, 0, 0, 0, 0, 0};
 		
-	/*	datas.stream().filter(x -> x.getData(1).equals(place))
-		.forEach(x -> {
-			for(int i=0; i<avg.length; i++) {
-				if(x.getData(i+2).length() != 0) {
-					placeDatas.get(i).add(Double.parseDouble(x.getData(i+2)));
-					count[i]++;
-					avg[i] += Double.parseDouble(x.getData(i+2));
-				} else placeDatas.get(i).add(0.0);
-			}
-		}); */// 검색 지역 데이터 담아줌
-		
 		String date = datas.get(0).getData(0);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		
@@ -197,26 +155,10 @@ public class GraphDialog extends JDialog {
 			e.printStackTrace();
 		}
 		
-		
-		
-		/*
-		for (Data data : datas) {
-			if(0 <= data.getData(0).compareTo(start) && 0 >= data.getData(0).compareTo(end) && data.getData(1).equals(place)) {
-				for(int i=0; i<avg.length; i++) {
-					if(x.getData(i+2).length() != 0) {
-						placeDatas.get(i).add(Double.parseDouble(x.getData(i+2)));
-						count[i]++;
-						avg[i] += Double.parseDouble(x.getData(i+2));
-					} else placeDatas.get(i).add(0.0);
-				}
-			}
-		}*/
-		
 		if ( Arrays.stream(count).sum() == 0 ) {
 			JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
 			return;
 		}
-		
 
 		
 		for(int i=0; i<avg.length; i++) // 평균 계산
@@ -224,7 +166,7 @@ public class GraphDialog extends JDialog {
 
 		
 		String[] row = {place, String.format("%.3f", avg[0]), String.format("%.3f", avg[1]), String.format("%.3f", avg[2]), String.format("%.3f", avg[3]), String.format("%.3f", avg[4]), String.format("%.3f", avg[5])};
-		
+
 		dtm.addRow(row);
 		
 		for(int i=0; i<gp.length; i++) {
