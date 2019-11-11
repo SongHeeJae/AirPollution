@@ -8,13 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.util.Map;
 
 public class LineGraphPanel extends GraphPanel{
 
-	private List<Graph<List<Double>>> datas;
 	public LineGraphPanel(String value) {
 		super(value);
 		datas = new ArrayList<>();
@@ -26,15 +23,16 @@ public class LineGraphPanel extends GraphPanel{
 		Color[] color = {Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE};
 		
 		((Graphics2D)g).setStroke(new BasicStroke(2));
-		for (int i=0; i<datas.size(); i++) {
+		for(int i=0; i<places.size(); i++) {
 			g.setColor(color[i]);
-			int y = (int)(590 - 550/(max/datas.get(i).getValue().get(0))), yy;
+			int y = (int)(590 - 550/(max/datas.get(i * datas.size()/places.size()))), yy;
 			g.fillRect(100, y-2, 4, 4);
-			for (int j=1; j<datas.get(i).getValue().size(); j++) {
+			int k = 1;
+			for (int j=i * datas.size()/places.size() + 1; j<(i+1) * datas.size() / places.size(); j++) {
 				yy = y;
-				y = (int)(590 - 550/(max/datas.get(i).getValue().get(j)));
-				g.fillRect((j+1)*100-2, y-2, 4, 4);
-				g.drawLine((j)*100, yy, (j+1)*100, y);
+				y = (int)(590 - 550/(max/datas.get(j)));
+				g.fillRect((k+1)*100-2, y-2, 4, 4);
+				g.drawLine((k)*100, yy, (1+k++)*100, y);
 			}
 		}
 		
@@ -45,7 +43,7 @@ public class LineGraphPanel extends GraphPanel{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			try {
 				cal.setTime(sdf.parse(start));
-				for(int i=1; i<=datas.get(0).getValue().size(); i++) {
+				for(int i=1; i<=datas.size()/places.size(); i++) {
 					g.drawString(sdf.format(cal.getTime()), i*100-20, 620);
 					cal.add(Calendar.DATE, 1);
 				}
@@ -56,28 +54,25 @@ public class LineGraphPanel extends GraphPanel{
 	}
 	
 	public void setResize() {
-		if(!datas.isEmpty() && datas.get(0).getValue().size() * 100 + 50 > getPreferredSize().getWidth())
-			setPreferredSize(new Dimension(datas.get(0).getValue().size() * 100 + 50, 650));
+		if(!datas.isEmpty() && datas.size()/places.size() * 100 + 50 > getPreferredSize().getWidth())
+			setPreferredSize(new Dimension(datas.size()/places.size() * 100 + 50, 650));
+		reload();
 	}
 	
 	public void removeGraph(int pos) {
-		datas.remove(pos);
+		int i = pos * datas.size()/places.size(), j = datas.size()/places.size();
+		while(j-- > 0) datas.remove(i);
+		places.remove(pos);
 		setResize();
-		reload();
 	}
 	
 	public void addGraph(String place, List<Double> value) {
-		datas.add(new Graph<List<Double>>(place, value));
+		places.add(place);
+		datas.addAll(value);
 		double m = value.stream().max(Double::compare).orElse(0.0);
 		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
 		setResize();
-		reload();
 	}
-	
-	public void clear() {
-		super.clear();
-		datas.clear();
-		reload();
-	}
+
 	
 }

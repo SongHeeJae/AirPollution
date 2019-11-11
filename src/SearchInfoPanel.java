@@ -42,8 +42,9 @@ public class SearchInfoPanel extends JPanel {
 				return;
 			}
 			frame.init(); //((Driver)getParent().getParent().getParent().getParent()).init(); 로 쓸수도 있음
-			String start = new SimpleDateFormat("yyyyMMdd").format(dateStartSpinner.getValue());
-			String end = new SimpleDateFormat("yyyyMMdd").format(dateEndSpinner.getValue());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			String start = sdf.format(dateStartSpinner.getValue());
+			String end = sdf.format(dateEndSpinner.getValue());
 			duration.setText(start + " ~ " + end);
 			frame.setDatas(Request.openData(frame.getTableName(), start, end), "전체");
 		});

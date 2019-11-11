@@ -1,9 +1,9 @@
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -29,7 +29,9 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	private int x, y;
 	protected double max; // 세로축 최대치
 	protected String start, end; // 시작 종료 기간
-	// List<Graph> datas;
+	//protected List<Graph<Double>> datas;
+	List<String> places;
+	List<Double> datas;
 	public GraphPanel() {
 	}
 	
@@ -37,6 +39,8 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		setPreferredSize(new Dimension(950, 650));
 		addMouseMotionListener(this);
 		this.pol = pol;
+		places = new ArrayList<>();
+		datas = new ArrayList<>();
 		max = 0;
 		start = "99999999";
 		end = "00000000";
@@ -70,7 +74,6 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	}
 	
 	public void addGraph(String place, double value) {}
-	
 	public void addGraph(String place, List<Double> value) {}
 	
 	public abstract void setResize();
@@ -85,6 +88,8 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	public void clear() {
 		setPreferredSize(new Dimension(950, 650));
 		max = 0;
+		datas.clear();
+		reload();
 	}
 
 	

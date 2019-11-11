@@ -43,7 +43,7 @@ public class GraphDialog extends JDialog {
 		
 		gp = new GraphPanel[6];
 		
-		if(graph.equals("막대 그래프")) 
+		if(graph.equals("막대 그래프"))
 			for (int i=0; i<gp.length; i++) gp[i] = new BarGraphPanel(header[i+1]);
 		else 
 			for (int i=0; i<gp.length; i++) gp[i] = new LineGraphPanel(header[i+1]);
@@ -62,7 +62,11 @@ public class GraphDialog extends JDialog {
 		
 		
 		JButton dateSearch = new JButton("검색");
-		dateSearch.addActionListener(e -> addTableRow(searchText.getText()));
+		dateSearch.addActionListener(e -> {
+			//if(gp[0] instanceof BarGraphPanel) addBarGraph(searchText.getText());
+		//	else addLineGraph(searchText.getText());
+			addTableRow(searchText.getText());
+		});
 		add(dateSearch);
 		
 		dtm = new DefaultTableModel(header, 0) {
@@ -103,6 +107,92 @@ public class GraphDialog extends JDialog {
 		setVisible(true);
 	}
 	
+	/*public void addLineGraph(String place) {
+		if(dtm.getRowCount() > 5) { // 지역 더 추가할 수 있는지 확인
+			JOptionPane.showMessageDialog(null, "더 이상 추가할 수 없습니다.");
+			return;
+		}
+		
+		for(int i=0; i<dtm.getRowCount(); i++) // 검색된 지역인지 확인
+			if(dtm.getValueAt(i, 0).equals(place)) {
+				JOptionPane.showMessageDialog(null, "이미 검색된 지역입니다.");
+				return;
+			} 
+		
+		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		int[] count = {0, 0, 0, 0, 0, 0};
+		
+		String date = datas.get(0).getData(0);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		
+		for(Data data : datas) {
+			if(data.getData(1).equals(place)) {
+				try {
+					int days = (int)((sdf.parse(data.getData(0)).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
+					while(days-- > 1) // 누락된 기간때문에 0으로 채워줌
+						for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				for(int i=0; i<gp.length; i++) {
+					if(data.getData(i+2).length() != 0) {
+						placeDatas.get(i).add(Double.parseDouble(data.getData(i+2)));
+						count[i]++;
+						avg[i] += Double.parseDouble(data.getData(i+2));
+					} else placeDatas.get(i).add(0.0);
+				}
+				date = data.getData(0);
+			} 
+		}
+		try { // 뒤에 남은 누락 기간들 0으로 채워줌
+			int days = (int)((sdf.parse(datas.get(datas.size()-1).getData(0)).getTime() - sdf.parse(datas.get(0).getData(0)).getTime()) / (24*60*60*1000));
+			while(placeDatas.get(0).size() <= days)
+				for(int i=0; i<gp.length; i++) placeDatas.get(i).add(0.0);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		if ( Arrays.stream(count).sum() == 0 ) {
+			JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
+			return;
+		}
+	}
+	
+	public void addBarGraph(String place) {
+		for(int i=0; i<dtm.getRowCount(); i++) // 검색된 지역인지 확인
+			if(dtm.getValueAt(i, 0).equals(place)) {
+				JOptionPane.showMessageDialog(null, "이미 검색된 지역입니다.");
+				return;
+			} 
+		
+
+		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		int[] count = {0, 0, 0, 0, 0, 0};
+		
+		for(Data data : datas)
+			if(data.getData(1).equals(place))
+				for(int i=0; i<gp.length; i++) {
+					if(data.getData(i+2).length() != 0) 
+						count[i]++;
+						avg[i] += Double.parseDouble(data.getData(i+2));
+				}
+		
+		
+		if ( Arrays.stream(count).sum() == 0 ) {
+			JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
+			return;
+		}
+		
+		String[] row = {place, String.format("%.3f", avg[0]), String.format("%.3f", avg[1]), String.format("%.3f", avg[2]), String.format("%.3f", avg[3]), String.format("%.3f", avg[4]), String.format("%.3f", avg[5])};
+
+		dtm.addRow(row);
+		
+		for(int i=0; i<gp.length; i++) {
+			gp[i].addGraph(row[0], Double.parseDouble(row[i+1]));
+			gp[i].setDuration(datas.get(0).getData(0), datas.get(datas.size() - 1).getData(0));
+		}
+	}
+	*/
 	public void addTableRow(String place) {
 		
 		// 개선해야할부분 너무 비효율적
