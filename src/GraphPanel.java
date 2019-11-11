@@ -43,7 +43,6 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	}
 	
 	public void setDuration(String start, String end) {
-		
 		this.start = Integer.parseInt(start) < Integer.parseInt(this.start) ? start : this.start;
 		this.end = Integer.parseInt(end) > Integer.parseInt(this.end) ? end : this.end;
 	}
@@ -70,13 +69,17 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		}
 	}
 	
+	public void addGraph(String place, double value) {}
 	
-	abstract public <T> void addGraph(String place, T value);
+	public void addGraph(String place, List<Double> value) {}
 	
-	abstract public void setResize();
+	public abstract void setResize();
 	
-	public void removeGraph(int pos) {
+	public abstract void removeGraph(int pos);
 	
+	public void reload() {
+		revalidate();
+		repaint();
 	}
 	
 	public void clear() {

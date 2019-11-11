@@ -170,7 +170,7 @@ public class GraphDialog extends JDialog {
 		dtm.addRow(row);
 		
 		for(int i=0; i<gp.length; i++) {
-			if(gp[0] instanceof BarGraphPanel) gp[i].addGraph(row[0], row[i+1]);
+			if(gp[0] instanceof BarGraphPanel) gp[i].addGraph(row[0], Double.parseDouble(row[i+1]));
 			else gp[i].addGraph(row[0], placeDatas.get(i));
 			gp[i].setDuration(datas.get(0).getData(0), datas.get(datas.size() - 1).getData(0));
 		}

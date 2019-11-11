@@ -133,13 +133,10 @@ public class Request {
 	public static String[] showTables() {
 		ArrayList<String> str = new ArrayList<>();
 	
-		String sql = "SHOW TABLES;";
 		try (Connection conn=getConnection();
 				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);) {
-			
+				ResultSet rs = stmt.executeQuery("SHOW TABLES;");) {
 			while(rs.next()) str.add(rs.getString(1));
-			
 		} catch (ClassNotFoundException e) {
 			System.out.println("클래스로딩에러");
 		} catch (SQLException e) {

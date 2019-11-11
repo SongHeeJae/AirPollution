@@ -53,8 +53,6 @@ public class LineGraphPanel extends GraphPanel{
 				e.printStackTrace();
 			}
 		}
-		
-
 	}
 	
 	public void setResize() {
@@ -65,25 +63,21 @@ public class LineGraphPanel extends GraphPanel{
 	public void removeGraph(int pos) {
 		datas.remove(pos);
 		setResize();
-		revalidate();
-		repaint();
+		reload();
 	}
 	
-	public <T> void addGraph(String place, T value) {
-		List<Double> v = (List<Double>)value;
-		datas.add(new Graph<List<Double>>(place, v));
-		double m = v.stream().max(Double::compare).orElse(0.0);
+	public void addGraph(String place, List<Double> value) {
+		datas.add(new Graph<List<Double>>(place, value));
+		double m = value.stream().max(Double::compare).orElse(0.0);
 		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
 		setResize();
-		revalidate();
-		repaint();
+		reload();
 	}
 	
 	public void clear() {
 		super.clear();
 		datas.clear();
-		revalidate();
-		repaint();
+		reload();
 	}
 	
 }
