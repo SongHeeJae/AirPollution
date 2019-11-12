@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
@@ -18,8 +19,8 @@ import javax.swing.table.DefaultTableModel;
 public class DataTablePanel extends JPanel {
 
 	private DefaultTableModel dtm;
-	private List<Data> datas;
 	private JLabel count;
+	private List<Data> datas;
 	private Set<String> places;
 	private List<JCheckBox> boxList;
 	private boolean chk = true; // 체크박스리스너. placeFilter 메소드 여러번 실행안하게함
@@ -30,8 +31,8 @@ public class DataTablePanel extends JPanel {
 		JTable table = new JTable();
 		count = new JLabel();
 		places = new HashSet<>();
-		datas = new ArrayList<>();
 		boxList = new ArrayList<>();
+		datas = new ArrayList<>();
 
 		String[] header = {"측정일시", "측정소명" ,"이산화질소농도(ppm)" , "오존농도(ppm)" , "이산화탄소농도(ppm)" , "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"}; 
 		dtm = new DefaultTableModel(new String[0][0], header);
@@ -42,7 +43,6 @@ public class DataTablePanel extends JPanel {
 		JScrollPane pane = new JScrollPane(table);
 		
 		pane.setPreferredSize(new Dimension(1000, 650));
-
 		add(pane);
 		add(count);
 	}
@@ -50,7 +50,7 @@ public class DataTablePanel extends JPanel {
 	public void add(Data data) {
 		datas.add(data);
 		dtm.addRow(data.getDatas());
-		if (!places.contains(data.getDatas()[1])) places.add(data.getDatas()[1]);
+		if (!places.contains(data.getPlace())) places.add(data.getPlace());
 	}
 	
 	public void initPlaceList() {
@@ -89,7 +89,7 @@ public class DataTablePanel extends JPanel {
 	public void placeFilter() {
 		dtm.setNumRows(0);
 		for(Data data : datas)
-			if(places.contains(data.getData(1))) dtm.addRow(data.getDatas());
+			if(places.contains(data.getPlace())) dtm.addRow(data.getDatas());
 		count.setText("조회수 : " + dtm.getRowCount());
 	}
 }

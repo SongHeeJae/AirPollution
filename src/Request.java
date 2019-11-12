@@ -10,7 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Request {
 	private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -71,12 +73,13 @@ public class Request {
 		return DriverManager.getConnection(Request.url, Request.id, Request.password); // url, 아이디, 비번
 	}
 	
-	public static List<Data> openData(String str, String start, String end) {
+	public static Datas openData(String name, String start, String end) {
 		
-		List<Data> datas = new ArrayList<>();
+		Map<String, List<Data>> datas = new HashMap<>();
+		String first="", last="";
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("SELECT * FROM `").append(str).append("`");
+		sb.append("SELECT * FROM `").append(name).append("`");
 		if(start !=null && end != null)
 			sb.append("WHERE ").append(start).append("<=`date` AND `date` <=").append(end);
 		sb.append(";");
@@ -84,17 +87,26 @@ public class Request {
 		try (Connection conn=getConnection();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sb.toString());) {
-
-			while(rs.next())
-				datas.add(new Data(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)));
-			
+			while(rs.next()) {
+				if(datas.get(rs.getString(3)) == null) datas.put(rs.getString(3), new ArrayList<Data>());
+				datas.get(rs.getString(3)).add(new Data(rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getString(6),
+						rs.getString(7),
+						rs.getString(8),
+						rs.getString(9)));
+			}
 		} catch (ClassNotFoundException e) {
 			System.out.println("클래스로딩에러");
 		} catch (SQLException e) {
 			System.out.println("에러 : " + e.getMessage());
 		} 
 		
-		return datas;
+		Datas d = new Datas(name, datas);
+		
+		return d;
 	}
 	
 	public static void outputData(String str, String path) {

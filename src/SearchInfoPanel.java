@@ -46,7 +46,8 @@ public class SearchInfoPanel extends JPanel {
 			String start = sdf.format(dateStartSpinner.getValue());
 			String end = sdf.format(dateEndSpinner.getValue());
 			duration.setText(start + " ~ " + end);
-			frame.setDatas(Request.openData(frame.getTableName(), start, end), "전체");
+			frame.setDatas(Request.openData(frame.getTableName(), start, end));
+			frame.setTableDatas("전체");
 		});
 		add(dateSearch);
 		
@@ -54,7 +55,7 @@ public class SearchInfoPanel extends JPanel {
 		radioGroup = new ButtonGroup();
 		ItemListener listener = e -> {
 			if(frame.getTableName().length()==0 || e.getStateChange() == ItemEvent.DESELECTED) return; // 해제 이벤트 종료
-			frame.setDatas(null, ((JRadioButton)e.getItem()).getText());
+			frame.setTableDatas(((JRadioButton)e.getItem()).getText());
 		};
 		for(JRadioButton radio : radios) {
 			radio.addItemListener(listener);

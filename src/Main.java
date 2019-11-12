@@ -3,7 +3,9 @@ import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -21,7 +23,7 @@ import javax.swing.ListSelectionModel;
 
 public class Main extends JFrame {
 
-	private List<Data> datas = new ArrayList<>();
+	private Datas datas;
 	private JTabbedPane tab;
 	private SearchInfoPanel sip;
 	private JLabel tableName;
@@ -49,30 +51,39 @@ public class Main extends JFrame {
 		return tableName.getText();
 	}
 	
-	public List<Data> getDatas() {
+	public Datas getDatas() {
 		return datas;
 	}
 	
+	public void setDatas(Datas datas) {
+		this.datas = datas;
+	}
 	
-	public void setDatas(List<Data> datas, String duration) {
+	public void setTableDatas(String duration) {
 		
-		if(datas != null) this.datas = datas;
 		tab.removeAll();
+		
+		List<Data> list = new ArrayList<>();
+		for (String s : this.datas.getDatas().keySet())
+			list.addAll(this.datas.getDatas().get(s));
+		list.sort((x, y)->x.getDate().compareTo(y.getDate()));
+		datas.setStart(list.get(0).getDate());
+		datas.setEnd(list.get(list.size()-1).getDate());
 		
 		DataTablePanel dtp = new DataTablePanel();
 		if(duration.equals("전체")) {
 			tab.addTab("전체", dtp);
-			for (Data data : this.datas) dtp.add(data);
+			for (Data data : list) dtp.add(data);
 		} else {
 
 			int datelen = duration.equals("년") ? 4 : 6; // 
 			
-			tab.addTab(this.datas.get(0).getData(0).substring(0, datelen), dtp);
-			for (Data data : this.datas) {
-				if (!(data.getData(0).substring(0, datelen).equals(tab.getTitleAt(tab.getTabCount() - 1)))) {
+			tab.addTab(list.get(0).getDate().substring(0, datelen), dtp);
+			for (Data data : list) {
+				if (!(data.getDate().substring(0, datelen).equals(tab.getTitleAt(tab.getTabCount() - 1)))) {
 					dtp.initPlaceList();
 					dtp = new DataTablePanel();
-					tab.addTab(data.getData(0).substring(0, datelen), dtp);
+					tab.addTab(data.getDate().substring(0, datelen), dtp);
 				}
 				dtp.add(data);
 			}
@@ -136,7 +147,7 @@ public class Main extends JFrame {
 	}
 	
 	public void init() {
-		datas.clear();
+		datas.getDatas().clear();
 		sip.init();
 	}
 	
@@ -157,10 +168,10 @@ public class Main extends JFrame {
 			
 			String value = (String) list.getSelectedValue();
 			if(value == null) return;
-			init();
 			dialog.dispose();
-			setDatas(Request.openData(value, null, null), "전체");
-			tableName.setText(value);
+			setDatas(Request.openData(value, null, null));
+			setTableDatas("전체");
+			tableName.setText(datas.getName());
 		}); // 확인시 이벤트 처리
 		cancel.addActionListener(e -> dialog.dispose()); // 취소시 종료
 		
