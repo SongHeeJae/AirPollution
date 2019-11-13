@@ -3,10 +3,10 @@ import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -63,32 +63,29 @@ public class Main extends JFrame {
 		
 		tab.removeAll();
 		
-		List<Data> list = new ArrayList<>();
-		for (String s : this.datas.getDatas().keySet())
-			list.addAll(this.datas.getDatas().get(s));
-		list.sort((x, y)->x.getDate().compareTo(y.getDate()));
-		datas.setStart(list.get(0).getDate());
-		datas.setEnd(list.get(list.size()-1).getDate());
-		
-		DataTablePanel dtp = new DataTablePanel();
-		if(duration.equals("전체")) {
-			tab.addTab("전체", dtp);
-			for (Data data : list) dtp.add(data);
-		} else {
-
-			int datelen = duration.equals("년") ? 4 : 6; // 
-			
-			tab.addTab(list.get(0).getDate().substring(0, datelen), dtp);
-			for (Data data : list) {
-				if (!(data.getDate().substring(0, datelen).equals(tab.getTitleAt(tab.getTabCount() - 1)))) {
-					dtp.initPlaceList();
-					dtp = new DataTablePanel();
-					tab.addTab(data.getDate().substring(0, datelen), dtp);
-				}
-				dtp.add(data);
-			}
+		List<Data> list = datas.getDatas();
+		Map<String, List<Data>> m = new HashMap<>();
+		for (Data data : list) {
+			if(m.get(data.getPlace()) == null) m.put(data.getPlace(), new ArrayList<>());
+			m.get(data.getPlace()).add(data);
 		}
-		dtp.initPlaceList();
+		tab.addTab("전체", new DataTablePanel(m));
+		
+		if (!duration.equals("전체")) {
+			int datelen = duration.equals("년") ? 4 : 6;
+			for (int i=0; i<list.size() - 1; i++) {
+				if(m.get(list.get(i).getPlace()) == null) m.put(list.get(i).getPlace(), new ArrayList<>());
+				m.get(list.get(i).getPlace()).add(list.get(i));
+				
+				if (!(list.get(i).getDate().substring(0, datelen).equals(list.get(i+1).getDate().substring(0, datelen)))) {
+					tab.addTab(list.get(i).getDate().substring(0, datelen), new DataTablePanel(m));
+					m = new HashMap<>();
+				}
+			}
+			if(m.get(list.get(list.size()-1).getPlace()) == null) m.put(list.get(list.size()-1).getPlace(), new ArrayList<>());
+			m.get(list.get(list.size()-1).getPlace()).add(list.get(list.size()-1)); // 누락된 마지막 한번 수행
+			tab.addTab(list.get(list.size()-1).getDate().substring(0, datelen), new DataTablePanel(m));
+		}
 	}
 	
 	public void createMenu() { // 메뉴 생성
@@ -142,7 +139,7 @@ public class Main extends JFrame {
 	}
 	
 	public void showGraphDialog(String graph) {
-		if(getTableName().length() != 0) new GraphDialog(graph, datas);
+		if(getTableName().length() != 0) new GraphDialog(graph, ((DataTablePanel)tab.getComponentAt(0)).getDatas(), datas.getStart(), datas.getEnd());
 		else JOptionPane.showMessageDialog(null, "데이터를 열어주세요.");
 	}
 	
@@ -192,6 +189,7 @@ public class Main extends JFrame {
 		
 		JButton ok = new JButton("확인");
 		JButton cancel = new JButton("취소");
+		JButton remove = new JButton("삭제");
 		ok.addActionListener(e -> {
 			FileDialog fd = new FileDialog(this, "열기", FileDialog.SAVE);
 			fd.setDirectory(".");

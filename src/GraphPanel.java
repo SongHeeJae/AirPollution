@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-class Graph<T> {
+/*class Graph<T> {
 	private String place;
 	private T value;
 	Graph (String place, T value) {
@@ -21,35 +21,33 @@ class Graph<T> {
 	public T getValue() {
 		return value;
 	}
-}
+}*/
 
 public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	
-	private String pol; // 오염물질 종류
+	//private String pol; // 오염물질 종류
+	private int pol;
 	private int x, y;
 	protected double max; // 세로축 최대치
 	protected String start, end; // 시작 종료 기간
 	//protected List<Graph<Double>> datas;
-	List<String> places;
-	List<Double> datas;
+	protected List<String> places;
+	protected List<Double> datas;
 	public GraphPanel() {
 	}
 	
-	public GraphPanel(String pol) {
+	public GraphPanel(String start, String end, int pol) {
 		setPreferredSize(new Dimension(950, 650));
 		addMouseMotionListener(this);
+
 		this.pol = pol;
 		places = new ArrayList<>();
 		datas = new ArrayList<>();
 		max = 0;
-		start = "99999999";
-		end = "00000000";
+		this.start = start;
+		this.end = end;
 	}
 	
-	public void setDuration(String start, String end) {
-		this.start = Integer.parseInt(start) < Integer.parseInt(this.start) ? start : this.start;
-		this.end = Integer.parseInt(end) > Integer.parseInt(this.end) ? end : this.end;
-	}
 	
 	@Override
 	public void paint(Graphics g) {
@@ -59,7 +57,7 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		g.drawLine(50, 40, 50, 590);
 		g.drawLine(50, 590, (int)getPreferredSize().getWidth(), 590);
 		
-		if(pol.equals("미세먼지(㎍/㎥)") || pol.equals("초미세먼지(㎍/㎥)")) g.drawString("(㎍/㎥)", 5, 20);
+		if(pol < 2) g.drawString("(㎍/㎥)", 5, 20);
 		else g.drawString("(ppm)", 5, 20);
 		
 		if(max != 0) {
@@ -75,7 +73,7 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	
 	public void addGraph(String place, double value) {}
 	public void addGraph(String place, List<Double> value) {}
-	
+
 	public abstract void setResize();
 	
 	public abstract void removeGraph(int pos);

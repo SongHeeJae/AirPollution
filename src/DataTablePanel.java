@@ -20,19 +20,17 @@ public class DataTablePanel extends JPanel {
 
 	private DefaultTableModel dtm;
 	private JLabel count;
-	private List<Data> datas;
-	private Set<String> places;
+	private Map<String, List<Data>> datas;
 	private List<JCheckBox> boxList;
 	private boolean chk = true; // 체크박스리스너. placeFilter 메소드 여러번 실행안하게함
 
-	public DataTablePanel() {
+	public DataTablePanel(Map<String, List<Data>> datas) {
 		setLayout(new FlowLayout());
 		setPreferredSize(new Dimension(1000, 900));
 		JTable table = new JTable();
 		count = new JLabel();
-		places = new HashSet<>();
 		boxList = new ArrayList<>();
-		datas = new ArrayList<>();
+		this.datas = datas;
 
 		String[] header = {"측정일시", "측정소명" ,"이산화질소농도(ppm)" , "오존농도(ppm)" , "이산화탄소농도(ppm)" , "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"}; 
 		dtm = new DefaultTableModel(new String[0][0], header);
@@ -45,17 +43,19 @@ public class DataTablePanel extends JPanel {
 		pane.setPreferredSize(new Dimension(1000, 650));
 		add(pane);
 		add(count);
+		
+		initPlaceList();
+		
+		placeFilter();
 	}
 	
-	public void add(Data data) {
-		datas.add(data);
-		dtm.addRow(data.getDatas());
-		if (!places.contains(data.getPlace())) places.add(data.getPlace());
+	public Map<String, List<Data>> getDatas() {
+		return datas;
 	}
 	
 	public void initPlaceList() {
 		JPanel placesList = new JPanel(); // 지역들 필터 할수있는 목록
-		List<String> list = new ArrayList<>(places);
+		List<String> list = new ArrayList<>(datas.keySet());
 		Collections.sort(list);
 		
 		ItemListener listener = e-> {
@@ -65,9 +65,6 @@ public class DataTablePanel extends JPanel {
 					if(e.getStateChange() == ItemEvent.SELECTED) box.setSelected(true);
 					else box.setSelected(false);
 				chk=true;
-			} else {
-				if(e.getStateChange() == ItemEvent.SELECTED) places.add(((JCheckBox)e.getItem()).getText());
-				else places.remove(((JCheckBox)e.getItem()).getText());
 			}
 			if(chk) placeFilter();
 		};
@@ -88,8 +85,9 @@ public class DataTablePanel extends JPanel {
 	
 	public void placeFilter() {
 		dtm.setNumRows(0);
-		for(Data data : datas)
-			if(places.contains(data.getPlace())) dtm.addRow(data.getDatas());
+		for(int i = 1; i<boxList.size(); i++)
+			if(boxList.get(i).isSelected())
+				for(Data d : datas.get(boxList.get(i).getText())) dtm.addRow(d.getDatas());
 		count.setText("조회수 : " + dtm.getRowCount());
 	}
 }

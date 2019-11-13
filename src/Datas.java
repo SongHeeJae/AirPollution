@@ -55,28 +55,23 @@ class Data {
 
 public class Datas {
 
-	private Map<String, List<Data>> datas;
+	private List<Data> datas;
 	private String name; // 테이블명
 	private String start;
 	private String end;
-	public Datas(String name, Map<String, List<Data>> datas) {
+	public Datas(String name, List<Data> datas, String start, String end) {
 		this.name = name;
 		this.datas = datas;
-	}
-	
-	public void setStart(String start) {
 		this.start = start;
-	}
-	
-	public void setEnd(String end) {
 		this.end = end;
 	}
+	
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Map<String, List<Data>> getDatas(){
+	public List<Data> getDatas(){
 		return datas;
 	}
 	

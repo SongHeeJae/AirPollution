@@ -75,7 +75,7 @@ public class Request {
 	
 	public static Datas openData(String name, String start, String end) {
 		
-		Map<String, List<Data>> datas = new HashMap<>();
+		List<Data> datas = new ArrayList<>();
 		String first="", last="";
 		StringBuilder sb = new StringBuilder();
 		
@@ -88,8 +88,7 @@ public class Request {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sb.toString());) {
 			while(rs.next()) {
-				if(datas.get(rs.getString(3)) == null) datas.put(rs.getString(3), new ArrayList<Data>());
-				datas.get(rs.getString(3)).add(new Data(rs.getString(2),
+				datas.add(new Data(rs.getString(2),
 						rs.getString(3),
 						rs.getString(4),
 						rs.getString(5),
@@ -104,7 +103,9 @@ public class Request {
 			System.out.println("에러 : " + e.getMessage());
 		} 
 		
-		Datas d = new Datas(name, datas);
+		datas.sort((x, y)->x.getDate().compareTo(y.getDate())); // 날짜로 이미 정렬된 데이터라면 불필요함
+
+		Datas d = new Datas(name, datas, datas.get(0).getDate(), datas.get(datas.size()-1).getDate());
 		
 		return d;
 	}

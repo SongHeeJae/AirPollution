@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class LineGraphPanel extends GraphPanel{
 
-	public LineGraphPanel(String value) {
-		super(value);
+	public LineGraphPanel(String start, String end, int pol) {
+		super(start, end, pol);
 		datas = new ArrayList<>();
 	}
 	
@@ -72,7 +72,5 @@ public class LineGraphPanel extends GraphPanel{
 		double m = value.stream().max(Double::compare).orElse(0.0);
 		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
 		setResize();
-	}
-
-	
+	}	
 }
