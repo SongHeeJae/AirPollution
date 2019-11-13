@@ -4,10 +4,13 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -156,13 +159,23 @@ public class Main extends JFrame {
 		dialog.setModal(true);
 		dialog.setLayout(new FlowLayout()); // 다이얼로그 생성
 		
-		JList list = new JList(Request.showTables());
+		Vector<String> tables = new Vector<>();
+		for(String s : Request.showTables()) tables.add(s);
+		JList list = new JList(tables);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 리스트 생성
 		
 		JButton ok = new JButton("확인");
 		JButton cancel = new JButton("취소");
+		JButton remove = new JButton("삭제");
+		
+		remove.addActionListener(e -> {
+			int i = list.getSelectedIndex();
+			if(i == -1) return;
+			Request.remove(tables.get(i));
+			tables.remove(i);
+			list.repaint();
+		});
 		ok.addActionListener(e -> {
-			
 			String value = (String) list.getSelectedValue();
 			if(value == null) return;
 			dialog.dispose();
@@ -175,6 +188,7 @@ public class Main extends JFrame {
 		dialog.add(new JScrollPane(list));
 		dialog.add(ok);
 		dialog.add(cancel);
+		dialog.add(remove);
 		dialog.pack();
 		dialog.setVisible(true);
 	}
@@ -189,7 +203,7 @@ public class Main extends JFrame {
 		
 		JButton ok = new JButton("확인");
 		JButton cancel = new JButton("취소");
-		JButton remove = new JButton("삭제");
+		
 		ok.addActionListener(e -> {
 			FileDialog fd = new FileDialog(this, "열기", FileDialog.SAVE);
 			fd.setDirectory(".");

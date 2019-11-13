@@ -110,6 +110,23 @@ public class Request {
 		return d;
 	}
 	
+	public static void remove(String str) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("DROP TABLE `").append(str).append("`");
+		
+		try (Connection conn=getConnection();
+				Statement stmt = conn.createStatement();){
+
+			stmt.execute(sb.toString());
+			
+		} catch (ClassNotFoundException e) {
+			System.out.println("클래스로딩에러");
+		} catch (SQLException e) {
+			System.out.println("에러 : " + e.getMessage());
+		} 
+	}
+	
 	public static void outputData(String str, String path) {
 		
 		StringBuilder sb = new StringBuilder();
