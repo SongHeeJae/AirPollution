@@ -59,13 +59,8 @@ public class Main extends JFrame {
 	}
 	
 	public void setDatas(Datas datas) {
-		this.datas = datas;
-	}
-	
-	public void setTableDatas(String duration) {
-		
 		tab.removeAll();
-		
+		this.datas = datas;
 		List<Data> list = datas.getDatas();
 		Map<String, List<Data>> m = new HashMap<>();
 		for (Data data : list) {
@@ -73,7 +68,15 @@ public class Main extends JFrame {
 			m.get(data.getPlace()).add(data);
 		}
 		tab.addTab("전체", new DataTablePanel(m));
+	}
+	
+	public void setTableDatas(String duration) {
 		
+		for(int i=tab.getTabCount() -1 ; i>0; i--) tab.remove(i);
+
+		List<Data> list = datas.getDatas();
+		Map<String, List<Data>> m = new HashMap<>();
+
 		if (!duration.equals("전체")) {
 			int datelen = duration.equals("년") ? 4 : 6;
 			for (int i=0; i<list.size() - 1; i++) {
@@ -180,6 +183,7 @@ public class Main extends JFrame {
 			if(value == null) return;
 			dialog.dispose();
 			setDatas(Request.openData(value, null, null));
+			sip.init();
 			setTableDatas("전체");
 			tableName.setText(datas.getName());
 		}); // 확인시 이벤트 처리

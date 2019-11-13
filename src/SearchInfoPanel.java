@@ -47,11 +47,10 @@ public class SearchInfoPanel extends JPanel {
 			String end = sdf.format(dateEndSpinner.getValue());
 			duration.setText(start + " ~ " + end);
 			frame.setDatas(Request.openData(frame.getTableName(), start, end));
-			frame.setTableDatas("전체");
 		});
 		add(dateSearch);
 		
-		JRadioButton[] radios = {new JRadioButton("전체"), new JRadioButton("년"), new JRadioButton("월")};
+		JRadioButton[] radios = {new JRadioButton("년"), new JRadioButton("월")};
 		radioGroup = new ButtonGroup();
 		ItemListener listener = e -> {
 			if(frame.getTableName().length()==0 || e.getStateChange() == ItemEvent.DESELECTED) return; // 해제 이벤트 종료
