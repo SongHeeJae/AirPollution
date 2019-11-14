@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +58,13 @@ public class GraphDialog extends JDialog {
 		
 		
 		JButton dateSearch = new JButton("검색");
-		dateSearch.addActionListener(e -> addTableRow(searchText.getText()));
+		dateSearch.addActionListener(e -> {
+			try {
+				addTableRow(searchText.getText());
+			} catch (ParseException err) {
+				err.printStackTrace();
+			}
+		});
 		add(dateSearch);
 		
 		dtm = new DefaultTableModel(header, 0) {
@@ -96,10 +103,9 @@ public class GraphDialog extends JDialog {
 		setVisible(true);
 	}
 	
-	public void addTableRow(String place) {
+	public void addTableRow(String place) throws ParseException{
 		
-		// 개선해야할부분 너무 비효율적
-		
+
 		if(gp[0] instanceof LineGraphPanel && dtm.getRowCount() > 5) { // 지역 더 추가할 수 있는지 확인
 			JOptionPane.showMessageDialog(null, "더 이상 추가할 수 없습니다.");
 			return;
@@ -125,15 +131,18 @@ public class GraphDialog extends JDialog {
 		for(int i=0; i<gp.length; i++) placeDatas.add(new ArrayList<Double>());
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		String date = start;
+	
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(sdf.parse(start));
+		cal.add(Calendar.DATE, -1);
+		String date = sdf.format(cal.getTime());
+
 		for(Data d : data) {
-			try {
-				int days = (int)((sdf.parse(d.getDate()).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
-				while(days-- > 1) // 누락된 기간때문에 0으로 채워줌
-					for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
+			
+			int days = (int)((sdf.parse(d.getDate()).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
+			while(days-- > 1)// 누락된 기간때문에 0으로 채워줌
+				for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
+		
 			for(int i=0; i<gp.length; i++) {
 				if(d.getData(i+2).length() != 0) {
 					placeDatas.get(i).add(Double.parseDouble(d.getData(i+2)));
@@ -142,15 +151,11 @@ public class GraphDialog extends JDialog {
 				} else placeDatas.get(i).add(0.0);
 			}
 			date = d.getDate();
-			
 		}
-		try { // 뒤에 남은 누락 기간들 0으로 채워줌
-			int days = (int)((sdf.parse(end).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
-			while(placeDatas.get(0).size() <= days)
-				for(int i=0; i<gp.length; i++) placeDatas.get(i).add(0.0);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		// 뒤에 남은 누락 기간들 0으로 채워줌
+		int days = (int)((sdf.parse(end).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
+		while(placeDatas.get(0).size() <= days)
+			for(int i=0; i<gp.length; i++) placeDatas.get(i).add(0.0);
 		
 		for(int i=0; i<avg.length; i++) // 평균 계산
 			avg[i] = avg[i] != 0 ? avg[i] / (double)count[i] : 0;	// double 0으로 나누면 NaN으로뜸

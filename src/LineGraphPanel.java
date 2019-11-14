@@ -36,7 +36,6 @@ public class LineGraphPanel extends GraphPanel{
 			}
 		}
 		
-		
 		if(datas.size() != 0) {
 			g.setColor(Color.BLACK);
 			Calendar cal = Calendar.getInstance();
@@ -65,12 +64,4 @@ public class LineGraphPanel extends GraphPanel{
 		places.remove(pos);
 		setResize();
 	}
-	
-	public void addGraph(String place, List<Double> value) {
-		places.add(place);
-		datas.addAll(value);
-		double m = value.stream().max(Double::compare).orElse(0.0);
-		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
-		setResize();
-	}	
 }

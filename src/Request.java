@@ -41,12 +41,10 @@ public class Request {
 			
 			int len = br.readLine().split(",").length; // 첫행 넘기고 열 길이 가져옴. 누락데이터 처리
 			while((line = br.readLine()) != null) {
-				// 파일 읽는 속도 개선 필요
 				int i=0;
 				sb.setLength(0);
 				String[] datas = line.split(",");
 				
-				// 누락데이터 그냥 공백으로 넣음
 				sb.append("INSERT INTO `")
 					.append(name)
 					.append("` (`date`, `place`, `nitrogen`, `ozone`, `carbon`, `gas`, `dust`, `ultradust`) VALUES('")

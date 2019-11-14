@@ -25,12 +25,10 @@ import javax.swing.JPanel;
 
 public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	
-	//private String pol; // 오염물질 종류
 	private int pol;
 	private int x, y;
 	protected double max; // 세로축 최대치
 	protected String start, end; // 시작 종료 기간
-	//protected List<Graph<Double>> datas;
 	protected List<String> places;
 	protected List<Double> datas;
 	public GraphPanel() {
@@ -71,8 +69,20 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		}
 	}
 	
-	public void addGraph(String place, double value) {}
-	public void addGraph(String place, List<Double> value) {}
+	public void addGraph(String place, double value) {
+		places.add(place);
+		datas.add(value);
+		if(max <= value) max = value*2; // 현재 간격보다 최대치면 기준바꿔줌
+		setResize();
+	}
+	
+	public void addGraph(String place, List<Double> value) {
+		places.add(place);
+		datas.addAll(value);
+		double m = value.stream().max(Double::compare).orElse(0.0);
+		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
+		setResize();
+	}	
 
 	public abstract void setResize();
 	

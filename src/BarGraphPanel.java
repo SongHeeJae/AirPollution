@@ -23,20 +23,7 @@ public class BarGraphPanel extends GraphPanel {
 		}
 	}
 	
-	public void addGraph(String place, double value) {
-		places.add(place);
-		datas.add(value);
-		
-		if(max <= value) max = value*2; // 현재 간격보다 최대치면 기준바꿔줌
-		
-		setResize();
-	}
-	
-	public Object[] addGraph2(String place, List<Data> value) {
-		places.add(place);
-		
-		return null;
-	}
+
 	
 	public void setResize() {
 		if(datas.size() * 125 + 50 > getPreferredSize().getWidth())

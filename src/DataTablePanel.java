@@ -33,9 +33,16 @@ public class DataTablePanel extends JPanel {
 		this.datas = datas;
 
 		String[] header = {"측정일시", "측정소명" ,"이산화질소농도(ppm)" , "오존농도(ppm)" , "이산화탄소농도(ppm)" , "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"}; 
-		dtm = new DefaultTableModel(new String[0][0], header);
+
+		dtm = new DefaultTableModel(header, 0) {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		table.setModel(dtm);
 		
+		
+		// 수정할부분
 		table.setAutoCreateRowSorter(true);
 		
 		JScrollPane pane = new JScrollPane(table);
