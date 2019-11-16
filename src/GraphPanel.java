@@ -58,7 +58,7 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		if(pol < 2) g.drawString("(㎍/㎥)", 5, 20);
 		else g.drawString("(ppm)", 5, 20);
 		
-		if(max != 0) {
+		if(!places.isEmpty()) {
 			for(int i=0; i<11; i++)
 				g.drawString(String.format("%.3f", max/10*(10-i)), 5, 50+(55*i)); // 라인 높이 550
 			if(50 <= x && x <= (int)getPreferredSize().getWidth() && 40 <= y && y <= 590)

@@ -22,7 +22,7 @@ public class LineGraphPanel extends GraphPanel{
 		super.paint(g);
 		Color[] color = {Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE};
 		
-		if(!places.isEmpty() && 50 < x && x <= 50 + datas.size()/places.size()*100 && x/100*100-2 <= x && x <= x/100*100+2) {
+		if(!places.isEmpty() && 50 < x && x <= 50 + datas.size()/places.size()*100 && x/100*100-2 <= x && x <= x/100*100+2 && 40 <= y && y <= 590) {
 			for(int i=0; i<places.size(); i++) {
 				int y = (int)(590 - 550/(max/datas.get((x/100-1) + datas.size()/places.size()*i)));
 				g.drawLine(50, y, (int)getPreferredSize().getWidth(), y);
@@ -63,7 +63,7 @@ public class LineGraphPanel extends GraphPanel{
 	
 	public void setResize() {
 		if(!datas.isEmpty() && datas.size()/places.size() * 100 + 50 > getPreferredSize().getWidth())
-			setPreferredSize(new Dimension(datas.size()/places.size() * 100 + 50, 650));
+			setPreferredSize(new Dimension(datas.size()/places.size() * 100 + 100, 650));
 		reload();
 	}
 	

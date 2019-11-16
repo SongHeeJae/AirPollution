@@ -14,7 +14,7 @@ public class BarGraphPanel extends GraphPanel {
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		if(50 < x && x <= 50 + places.size()*100 && x/100*100 <= x && x <= x/100*100+50) {
+		if(50 < x && x <= 50 + places.size()*100 && x/100*100 <= x && x <= x/100*100+50 && 40 <= y && y <= 590) {
 			int y = (int)(590 - 550/(max/datas.get(x/100-1)));
 			g.drawLine(50, y, (int)getPreferredSize().getWidth(), y);
 			g.drawString(Double.toString(datas.get(x/100-1)), x+5, y-10);
@@ -38,6 +38,7 @@ public class BarGraphPanel extends GraphPanel {
 	
 	public void removeGraph(int pos) {
 		datas.remove(pos);
+		places.remove(pos);
 		setResize();
 	}
 	
