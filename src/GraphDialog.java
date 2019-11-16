@@ -59,11 +59,17 @@ public class GraphDialog extends JDialog {
 		
 		JButton dateSearch = new JButton("검색");
 		dateSearch.addActionListener(e -> {
-			try {
-				addTableRow(searchText.getText());
-			} catch (ParseException err) {
-				err.printStackTrace();
+			if(datas.get(searchText.getText()) == null) { // 검색 결과 있는지 확인
+				JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
+				return;
 			}
+			for(int i=0; i<dtm.getRowCount(); i++) // 검색된 지역인지 확인
+				if(dtm.getValueAt(i, 0).equals(searchText.getText())) {
+					JOptionPane.showMessageDialog(null, "이미 검색된 지역입니다.");
+					return;
+				} 
+			if(gp[0] instanceof LineGraphPanel) addLineGraph(searchText.getText());
+			else addBarGraph(searchText.getText());
 		});
 		add(dateSearch);
 		
@@ -103,70 +109,77 @@ public class GraphDialog extends JDialog {
 		setVisible(true);
 	}
 	
-	public void addTableRow(String place) throws ParseException{
+	public void addLineGraph(String place){
 		
-
-		if(gp[0] instanceof LineGraphPanel && dtm.getRowCount() > 5) { // 지역 더 추가할 수 있는지 확인
+		if(dtm.getRowCount() > 5) { // 지역 더 추가할 수 있는지 확인
 			JOptionPane.showMessageDialog(null, "더 이상 추가할 수 없습니다.");
 			return;
 		}
 		
-		if(datas.get(place) == null) { // 검색 결과 있는지 확인
-			JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
-			return;
+		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		int[] count = {0, 0, 0, 0, 0, 0};
+
+		ArrayList<List<Double>> placeDatas = new ArrayList<>(); // 오염물질별 데이터
+		
+		
+		for(int i=0; i<gp.length; i++) placeDatas.add(new ArrayList<Double>());
+			
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(sdf.parse(start));
+			cal.add(Calendar.DATE, -1);
+			String date = sdf.format(cal.getTime());
+		
+			for(Data d : datas.get(place)) {
+				if(!date.equals(d.getDate())) {
+					int days = (int)((sdf.parse(d.getDate()).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
+					while(days-- > 1)// 누락된 기간때문에 0으로 채워줌
+						for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
+				}
+				for(int i=0; i<gp.length; i++) {
+					if(d.getData(i+2).length() != 0) {
+						placeDatas.get(i).add(Double.parseDouble(d.getData(i+2)));
+						count[i]++;
+						avg[i] += Double.parseDouble(d.getData(i+2));
+					} else placeDatas.get(i).add(0.0);
+				}
+				date = d.getDate();
+			}			
+			int days = (int)((sdf.parse(end).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000)); // 뒤에 남은 누락 기간들 0으로 채워줌
+			while(placeDatas.get(0).size() <= days)
+				for(int i=0; i<gp.length; i++) placeDatas.get(i).add(0.0);
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 		
-		for(int i=0; i<dtm.getRowCount(); i++) // 검색된 지역인지 확인
-			if(dtm.getValueAt(i, 0).equals(place)) {
-				JOptionPane.showMessageDialog(null, "이미 검색된 지역입니다.");
-				return;
-			} 
+		
+		for(int i=0; i<avg.length; i++) // 평균 계산
+			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*100)/100.0 : 0;	// double 0으로 나누면 NaN으로뜸
+
+		dtm.addRow(new Object[] {place, avg[0], avg[1], avg[2], avg[3], avg[4], avg[5]});
+
+		for(int i=0; i<gp.length; i++) gp[i].addLineGraph(place, placeDatas.get(i));
+	}
+	
+	public void addBarGraph(String place){
 		
 		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		int[] count = {0, 0, 0, 0, 0, 0};
 		
-		List<Data> data = datas.get(place);
-		
-		ArrayList<List<Double>> placeDatas = new ArrayList<>();
-		for(int i=0; i<gp.length; i++) placeDatas.add(new ArrayList<Double>());
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(sdf.parse(start));
-		cal.add(Calendar.DATE, -1);
-		String date = sdf.format(cal.getTime());
-
-		for(Data d : data) {
-			
-			int days = (int)((sdf.parse(d.getDate()).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
-			while(days-- > 1)// 누락된 기간때문에 0으로 채워줌
-				for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
-		
-			for(int i=0; i<gp.length; i++) {
+		for (Data d : datas.get(place))
+			for (int i=0; i<gp.length; i++) {
 				if(d.getData(i+2).length() != 0) {
-					placeDatas.get(i).add(Double.parseDouble(d.getData(i+2)));
 					count[i]++;
 					avg[i] += Double.parseDouble(d.getData(i+2));
-				} else placeDatas.get(i).add(0.0);
+				}
 			}
-			date = d.getDate();
-		}
-		// 뒤에 남은 누락 기간들 0으로 채워줌
-		int days = (int)((sdf.parse(end).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
-		while(placeDatas.get(0).size() <= days)
-			for(int i=0; i<gp.length; i++) placeDatas.get(i).add(0.0);
-		
+
 		for(int i=0; i<avg.length; i++) // 평균 계산
-			avg[i] = avg[i] != 0 ? avg[i] / (double)count[i] : 0;	// double 0으로 나누면 NaN으로뜸
+			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*100)/100.0 : 0;	// double 0으로 나누면 NaN으로뜸
 
-		String[] row = {place, String.format("%.3f", avg[0]), String.format("%.3f", avg[1]), String.format("%.3f", avg[2]), String.format("%.3f", avg[3]), String.format("%.3f", avg[4]), String.format("%.3f", avg[5])};
+		dtm.addRow(new Object[] {place, avg[0], avg[1], avg[2], avg[3], avg[4], avg[5]});
 
-		dtm.addRow(row);
-		
-		if(gp[0] instanceof BarGraphPanel)
-			for(int i=0; i<gp.length; i++) gp[i].addGraph(place, Double.parseDouble(row[i+1]));
-		else 
-			for(int i=0; i<gp.length; i++) gp[i].addGraph(place, placeDatas.get(i));
+		for(int i=0; i<gp.length; i++) gp[i].addBarGraph(place, avg[i]);
 	}
 }

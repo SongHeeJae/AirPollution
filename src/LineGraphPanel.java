@@ -22,6 +22,15 @@ public class LineGraphPanel extends GraphPanel{
 		super.paint(g);
 		Color[] color = {Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE};
 		
+		if(!places.isEmpty() && 50 < x && x <= 50 + datas.size()/places.size()*100 && x/100*100-2 <= x && x <= x/100*100+2) {
+			for(int i=0; i<places.size(); i++) {
+				int y = (int)(590 - 550/(max/datas.get((x/100-1) + datas.size()/places.size()*i)));
+				g.drawLine(50, y, (int)getPreferredSize().getWidth(), y);
+				g.drawString(places.get(i) + " - " + Double.toString(datas.get((x/100-1) + datas.size()/places.size()*i)), x+5, y-10);
+			}
+		}
+		
+		
 		((Graphics2D)g).setStroke(new BasicStroke(2));
 		for(int i=0; i<places.size(); i++) {
 			g.setColor(color[i]);
