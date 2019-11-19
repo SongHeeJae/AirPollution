@@ -8,20 +8,6 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-/*class Graph<T> {
-	private String place;
-	private T value;
-	Graph (String place, T value) {
-		this.place = place;
-		this.value = value;
-	}
-	public String getPlace() {
-		return place;
-	}
-	public T getValue() {
-		return value;
-	}
-}*/
 
 public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 	
@@ -89,14 +75,6 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		revalidate();
 		repaint();
 	}
-	
-	public void clear() {
-		setPreferredSize(new Dimension(950, 650));
-		max = 0;
-		datas.clear();
-		reload();
-	}
-
 	
 	@Override
 	public void mouseDragged(MouseEvent arg0) {

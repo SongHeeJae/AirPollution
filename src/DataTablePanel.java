@@ -4,10 +4,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -15,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public class DataTablePanel extends JPanel {
 
@@ -41,9 +40,19 @@ public class DataTablePanel extends JPanel {
 		};
 		table.setModel(dtm);
 		
-		
-		// 수정할부분
-		table.setAutoCreateRowSorter(true);
+		TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(dtm);
+
+		sorter.setComparator(0, (x, y)->{
+			double xx = x.toString().length() != 0 ? Double.parseDouble(x.toString()) : -1;
+			double yy = y.toString().length() != 0 ? Double.parseDouble(y.toString()) : -1;
+			if(xx-yy > 0) return 1;
+			else if (xx-yy < 0) return -1;
+			else return 0;
+		});
+
+		for(int i=2; i<header.length; i++) sorter.setComparator(i, sorter.getComparator(0));
+		table.setRowSorter(sorter);
+		table.setAutoCreateRowSorter(false);
 		
 		JScrollPane pane = new JScrollPane(table);
 		
@@ -64,7 +73,6 @@ public class DataTablePanel extends JPanel {
 		JPanel placesList = new JPanel(); // 지역들 필터 할수있는 목록
 		List<String> list = new ArrayList<>(datas.keySet());
 		Collections.sort(list);
-		
 		ItemListener listener = e-> {
 			if(((JCheckBox)e.getItem()).getText().equals("전체")) {
 				chk=false;

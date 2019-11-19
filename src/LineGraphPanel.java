@@ -14,7 +14,6 @@ public class LineGraphPanel extends GraphPanel{
 
 	public LineGraphPanel(String start, String end, int pol) {
 		super(start, end, pol);
-		datas = new ArrayList<>();
 	}
 	
 	@Override

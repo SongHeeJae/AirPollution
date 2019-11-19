@@ -57,11 +57,11 @@ public class Request {
 				stmt.execute(sb.toString());
 			}
 		} catch (IOException e) {
-			System.out.println("파일에러 : "  + e.getMessage());
+			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			System.out.println("클래스로딩에러 : " + e.getMessage());
+			e.printStackTrace();
 		} catch (SQLException e) {
-			System.out.println("에러 : " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 	}
@@ -69,6 +69,7 @@ public class Request {
 	public static Connection getConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(Request.driver);
 		return DriverManager.getConnection(Request.url, Request.id, Request.password); // url, 아이디, 비번
+	
 	}
 	
 	public static Datas openData(String name, String start, String end) {
@@ -96,9 +97,9 @@ public class Request {
 						rs.getString(9)));
 			}
 		} catch (ClassNotFoundException e) {
-			System.out.println("클래스로딩에러");
+			e.printStackTrace();
 		} catch (SQLException e) {
-			System.out.println("에러 : " + e.getMessage());
+			e.printStackTrace();
 		} 
 		
 		datas.sort((x, y)->x.getDate().compareTo(y.getDate())); // 날짜로 이미 정렬된 데이터라면 불필요함
@@ -119,9 +120,9 @@ public class Request {
 			stmt.execute(sb.toString());
 			
 		} catch (ClassNotFoundException e) {
-			System.out.println("클래스로딩에러");
+			e.printStackTrace();
 		} catch (SQLException e) {
-			System.out.println("에러 : " + e.getMessage());
+			e.printStackTrace();
 		} 
 	}
 	
@@ -150,11 +151,11 @@ public class Request {
 						.append(rs.getString(9)).toString());
 			}
 		} catch (IOException e){
-			System.out.println("입출력에러" + e.getMessage());
+			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-			System.out.println("클래스로딩에러");
+			e.printStackTrace();
 		} catch (SQLException e) {
-			System.out.println("에러 : " + e.getMessage());
+			e.printStackTrace();
 		} 
 	}
 	
@@ -166,9 +167,9 @@ public class Request {
 				ResultSet rs = stmt.executeQuery("SHOW TABLES;");) {
 			while(rs.next()) str.add(rs.getString(1));
 		} catch (ClassNotFoundException e) {
-			System.out.println("클래스로딩에러");
+			e.printStackTrace();
 		} catch (SQLException e) {
-			System.out.println("에러 : " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return str.toArray(new String[str.size()]);

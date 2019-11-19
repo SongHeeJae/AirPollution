@@ -8,10 +8,6 @@ class Data {
 		datas = new String[] {date, place, nitrogen, ozone, carbon, gas, dust, ultraDust};
 	}
 	
-	public static void setInfo(String name, String start, String end) {
-		
-	}
-	
 	public String getData(int pos) {
 		return datas[pos];
 	}

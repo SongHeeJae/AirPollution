@@ -7,7 +7,6 @@ public class BarGraphPanel extends GraphPanel {
 	
 	public BarGraphPanel(String start, String end, int pol) {
 		super(start, end, pol);
-		datas = new ArrayList<>();
 	}
 	
 	@Override
