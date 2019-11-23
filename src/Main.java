@@ -58,7 +58,7 @@ public class Main extends JFrame {
 		return datas;
 	}
 	
-	public void setDatas(Datas datas) {
+	public void setDatas(Datas datas) { // 열기로 가져온 데이터 지정. 초기에는 전체 탭에 담아줌
 		tab.removeAll();
 		this.datas = datas;
 		List<Data> list = datas.getDatas();
@@ -70,14 +70,14 @@ public class Main extends JFrame {
 		tab.addTab("전체", new DataTablePanel(m));
 	}
 	
-	public void setTableDatas(String duration) {
+	public void setTableDatas(String duration) { // 년, 월 라디오버튼 선택했을 때의 이벤트 처리
 		
 		for(int i=tab.getTabCount() -1 ; i>0; i--) tab.remove(i);
 
 		List<Data> list = datas.getDatas();
 		Map<String, List<Data>> m = new HashMap<>();
 
-		if (!duration.equals("전체")) {
+		if (!duration.equals("전체") && !list.isEmpty()) {
 			int datelen = duration.equals("년") ? 4 : 6;
 			for (int i=0; i<list.size() - 1; i++) {
 				if(m.get(list.get(i).getPlace()) == null) m.put(list.get(i).getPlace(), new ArrayList<>());
@@ -139,13 +139,12 @@ public class Main extends JFrame {
 					break;
 				default: // 막대, 꺾은선 메뉴
 					showGraphDialog(e.getActionCommand());
-					break;
 			}
 		}
 	}
 	
 	public void showGraphDialog(String graph) {
-		if(getTableName().length() != 0) new GraphDialog(graph, ((DataTablePanel)tab.getComponentAt(0)).getDatas(), datas.getStart(), datas.getEnd());
+		if(getTableName().length() != 0 && !datas.getDatas().isEmpty()) new GraphDialog(graph, ((DataTablePanel)tab.getComponentAt(0)).getDatas(), datas.getStart(), datas.getEnd());
 		else JOptionPane.showMessageDialog(null, "데이터를 열어주세요.");
 	}
 	
@@ -155,8 +154,6 @@ public class Main extends JFrame {
 	}
 	
 	public void open() {
-		
-		// 열린 파일 있을경우 별도 예외처리
 		
 		JDialog dialog = new JDialog();
 		dialog.setModal(true);

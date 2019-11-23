@@ -17,9 +17,9 @@ public class BarGraphPanel extends GraphPanel {
 			int y = (int)(590 - 550/(max/datas.get(x/100-1)));
 			g.drawLine(50, y, (int)getPreferredSize().getWidth(), y);
 			g.drawString(Double.toString(datas.get(x/100-1)), x+5, y-10);
-		}
+		} // 마우스 x좌표가 그래프의 x좌표에 닿았을때의 처리
 		
-		for (int i=0; i<datas.size(); i++) {
+		for (int i=0; i<datas.size(); i++) { // 막대그래프 그리기
 			int y = (int)(590 - 550/(max/datas.get(i)));
 			g.drawRect((i+1)*100, y, 50, 590-y);
 			g.drawString(places.get(i), (i+1)*100, 620);

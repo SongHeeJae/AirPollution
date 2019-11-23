@@ -21,18 +21,18 @@ public class LineGraphPanel extends GraphPanel{
 		super.paint(g);
 		Color[] color = {Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE};
 		
-		if(!places.isEmpty() && 50 < x && x <= 50 + datas.size()/places.size()*100 && x/100*100-2 <= x && x <= x/100*100+2 && 40 <= y && y <= 590) {
+		if(!places.isEmpty() && 50 < x && x <= 50 + datas.size()/places.size()*100 && x/100*100-2 <= x && x <= x/100*100+2 && 40 <= y && y <= 590)
 			for(int i=0; i<places.size(); i++) {
 				int y = (int)(590 - 550/(max/datas.get((x/100-1) + datas.size()/places.size()*i)));
 				g.drawLine(50, y, (int)getPreferredSize().getWidth(), y);
 				g.drawString(places.get(i) + " - " + Double.toString(datas.get((x/100-1) + datas.size()/places.size()*i)), x+5, y-10);
-			}
-		}
+			} // 마우스의 x좌표가 그래프의 x좌표에 닿았을때의 처리
 		
 		
 		((Graphics2D)g).setStroke(new BasicStroke(2));
-		for(int i=0; i<places.size(); i++) {
+		for(int i=0; i<places.size(); i++) { // 꺾은선 그래프 그리기
 			g.setColor(color[i]);
+			g.drawString("●" + places.get(i), (i+1)*100, 645);
 			int y = (int)(590 - 550/(max/datas.get(i * datas.size()/places.size()))), yy;
 			g.fillRect(100, y-2, 4, 4);
 			int k = 1;
@@ -44,7 +44,7 @@ public class LineGraphPanel extends GraphPanel{
 			}
 		}
 		
-		if(datas.size() != 0) {
+		if(!datas.isEmpty()) { // 열린데이터가 있으면 가로축 그려줌
 			g.setColor(Color.BLACK);
 			Calendar cal = Calendar.getInstance();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

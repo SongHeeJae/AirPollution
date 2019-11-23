@@ -20,10 +20,8 @@ public class Request {
 	private static final String id = "root";
 	private static final String password = "468315";
 
-	public static void inputData(String path, String name) {
+	public static void inputData(String path, String name) { // 파일데이터 서버에 입력 메소드
 		
-		// name(테이블명)이 이미 있을 경우 예외처리, 없을 경우 CREATE TABLE
-			
 		StringBuilder sb = new StringBuilder();
 		sb.append("CREATE TABLE IF NOT EXISTS `")
 		.append(name)
@@ -36,8 +34,6 @@ public class Request {
 			String line;
 			
 			stmt.execute(sb.toString());
-			
-			// 파일 이미 있으면 별도의 예외처리
 			
 			int len = br.readLine().split(",").length; // 첫행 넘기고 열 길이 가져옴. 누락데이터 처리
 			while((line = br.readLine()) != null) {
@@ -72,10 +68,9 @@ public class Request {
 	
 	}
 	
-	public static Datas openData(String name, String start, String end) {
+	public static Datas openData(String name, String start, String end) { // 서버데이터 열기
 		
 		List<Data> datas = new ArrayList<>();
-		String first="", last="";
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("SELECT * FROM `").append(name).append("`");
@@ -101,15 +96,20 @@ public class Request {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} 
-		
-		datas.sort((x, y)->x.getDate().compareTo(y.getDate())); // 날짜로 이미 정렬된 데이터라면 불필요함
 
-		Datas d = new Datas(name, datas, datas.get(0).getDate(), datas.get(datas.size()-1).getDate());
+		String s = null, e = null; 
+		if(!datas.isEmpty()) {
+			datas.sort((x, y)->x.getDate().compareTo(y.getDate())); // 날짜순으로 정렬
+			s=datas.get(0).getDate();
+			e=datas.get(datas.size()-1).getDate();
+		}
+		
+		Datas d = new Datas(name, datas, s, e);
 		
 		return d;
 	}
 	
-	public static void remove(String str) {
+	public static void remove(String str) { // 서버 테이블 삭제
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("DROP TABLE `").append(str).append("`");
@@ -126,7 +126,7 @@ public class Request {
 		} 
 	}
 	
-	public static void outputData(String str, String path) {
+	public static void outputData(String str, String path) { // 서버데이터 파일로 출력
 		
 		StringBuilder sb = new StringBuilder();
 
@@ -159,7 +159,7 @@ public class Request {
 		} 
 	}
 	
-	public static String[] showTables() {
+	public static String[] showTables() { // 테이블 목록 반환
 		ArrayList<String> str = new ArrayList<>();
 	
 		try (Connection conn=getConnection();

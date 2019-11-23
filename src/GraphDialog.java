@@ -25,8 +25,8 @@ public class GraphDialog extends JDialog {
 	private GraphPanel[] gp;
 	private Map<String, List<Data>> datas;
 	private DefaultTableModel dtm;
-	private String start;
-	private String end;
+	private String start; // 조회기간 시작
+	private String end; // 조회기간 끝
 	public GraphDialog(String graph,  Map<String, List<Data>> datas, String start, String end) {
 		setLayout(new FlowLayout());
 		setSize(1050, 1000);
@@ -51,7 +51,17 @@ public class GraphDialog extends JDialog {
 
 		add(tab);
 		
-		JLabel duration = new JLabel(start + " ~ " + end);
+		if(gp[0] instanceof BarGraphPanel) { // 막대그래프면 정렬버튼 추가
+			JButton order = new JButton("정렬");
+			order.addActionListener(e-> {
+				String text = ((JButton)e.getSource()).getText().equals("+") ? "-" : "+";
+				for(int i=0; i<gp.length; i++) gp[i].orderGraph(text);
+				order.setText(text);
+			});
+			add(order);
+		}
+		
+		JLabel duration = new JLabel("조회기간 : " + start + " ~ " + end);
 		add(duration);
 		JTextField searchText = new JTextField(20);
 		add(searchText);
@@ -74,31 +84,24 @@ public class GraphDialog extends JDialog {
 		add(dateSearch);
 		
 		dtm = new DefaultTableModel(header, 0) {
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
+			public boolean isCellEditable(int row, int column) { return false; }
 		};
 		
 		table.setModel(dtm);
 		JScrollPane pane = new JScrollPane(table);
-		table.addKeyListener(new KeyListener() {
-
+		table.addKeyListener(new KeyListener() { // 테이블에 키 리스너 등록
 			@Override
-			public void keyPressed(KeyEvent arg0) {
+			public void keyPressed(KeyEvent arg0) { // Del키 누르면 선택된 테이블 삭제
 				if(arg0.getKeyCode() == KeyEvent.VK_DELETE && table.getSelectedRow() != -1) {
 					for(GraphPanel g : gp) g.removeGraph(table.getSelectedRow());
 					dtm.removeRow(table.getSelectedRow());
 				}
 			}
-
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-			}
-
-			@Override
-			public void keyTyped(KeyEvent arg0) {
-			}
 			
+			@Override
+			public void keyReleased(KeyEvent arg0) { }
+			@Override
+			public void keyTyped(KeyEvent arg0) { }
 		});
 		
 		pane.setPreferredSize(new Dimension(1000, 200));
@@ -117,10 +120,9 @@ public class GraphDialog extends JDialog {
 		}
 		
 		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		int[] count = {0, 0, 0, 0, 0, 0};
+		int[] count = {0, 0, 0, 0, 0, 0}; // 누락데이터는 계산안함
 
 		ArrayList<List<Double>> placeDatas = new ArrayList<>(); // 오염물질별 데이터
-		
 		
 		for(int i=0; i<gp.length; i++) placeDatas.add(new ArrayList<Double>());
 			
@@ -134,7 +136,7 @@ public class GraphDialog extends JDialog {
 			for(Data d : datas.get(place)) {
 				if(!date.equals(d.getDate())) {
 					int days = (int)((sdf.parse(d.getDate()).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000));
-					while(days-- > 1)// 누락된 기간때문에 0으로 채워줌
+					while(days-- > 1)// 누락된 기간은 0으로 채워줌
 						for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
 				}
 				for(int i=0; i<gp.length; i++) {
@@ -155,7 +157,7 @@ public class GraphDialog extends JDialog {
 		
 		
 		for(int i=0; i<avg.length; i++) // 평균 계산
-			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*100)/100.0 : 0;	// double 0으로 나누면 NaN으로뜸
+			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*1000)/1000.0 : 0;	// double 0으로 나누면 NaN으로뜸
 
 		dtm.addRow(new Object[] {place, avg[0], avg[1], avg[2], avg[3], avg[4], avg[5]});
 
@@ -165,18 +167,17 @@ public class GraphDialog extends JDialog {
 	public void addBarGraph(String place){
 		
 		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		int[] count = {0, 0, 0, 0, 0, 0};
+		int[] count = {0, 0, 0, 0, 0, 0}; // 누락데이터는 계산 안함
 		
 		for (Data d : datas.get(place))
-			for (int i=0; i<gp.length; i++) {
+			for (int i=0; i<gp.length; i++)
 				if(d.getData(i+2).length() != 0) {
 					count[i]++;
 					avg[i] += Double.parseDouble(d.getData(i+2));
 				}
-			}
 
 		for(int i=0; i<avg.length; i++) // 평균 계산
-			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*100)/100.0 : 0;	// double 0으로 나누면 NaN으로뜸
+			avg[i] = avg[i] != 0 ? Math.round(avg[i] / (double)count[i]*1000)/1000.0 : 0;	// double 0으로 나누면 NaN으로뜸
 
 		dtm.addRow(new Object[] {place, avg[0], avg[1], avg[2], avg[3], avg[4], avg[5]});
 

@@ -30,13 +30,13 @@ public class SearchInfoPanel extends JPanel {
 		JSpinner dateStartSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
 		JSpinner dateEndSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
 		dateStartSpinner.setEditor(new JSpinner.DateEditor(dateStartSpinner, "yyyy-MM-dd"));
-		dateEndSpinner.setEditor(new JSpinner.DateEditor(dateEndSpinner, "yyyy-MM-dd"));
+		dateEndSpinner.setEditor(new JSpinner.DateEditor(dateEndSpinner, "yyyy-MM-dd")); // 날짜입력 스피너 생성
 		
 		add(dateStartSpinner);
 		add(dateEndSpinner);
 		
 		JButton dateSearch = new JButton("검색");
-		dateSearch.addActionListener(e -> {
+		dateSearch.addActionListener(e -> { // 검색버튼 이벤트 처리
 			if(frame.getTableName().length()==0) {
 				JOptionPane.showMessageDialog(null, "데이터를 열어주세요.");
 				return;
@@ -50,9 +50,9 @@ public class SearchInfoPanel extends JPanel {
 		});
 		add(dateSearch);
 		
-		JRadioButton[] radios = {new JRadioButton("년"), new JRadioButton("월")};
+		JRadioButton[] radios = {new JRadioButton("전체"), new JRadioButton("년"), new JRadioButton("월")};
 		radioGroup = new ButtonGroup();
-		ItemListener listener = e -> {
+		ItemListener listener = e -> { // 기간 지정 라디오버튼 이벤트 처리
 			if(frame.getTableName().length()==0 || e.getStateChange() == ItemEvent.DESELECTED) return; // 해제 이벤트 종료
 			frame.setTableDatas(((JRadioButton)e.getItem()).getText());
 		};
@@ -63,7 +63,7 @@ public class SearchInfoPanel extends JPanel {
 		}
 	}
 	
-	public void init() {
+	public void init() { // 검색옵션 상태 초기화
 		radioGroup.clearSelection();
 		duration.setText("전체 조회");
 	}
