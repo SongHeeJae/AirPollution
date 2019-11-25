@@ -80,10 +80,9 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		reload();
 	}
 	
-	public void addLineGraph(String place, List<Double> value) {
+	public void addLineGraph(String place, List<Double> value, double m) {
 		places.add(place);
 		datas.addAll(value);
-		double m = value.stream().max(Double::compare).orElse(0.0);
 		max = m > max ? m : max; // 현재 간격보다 최대치면 기준바꿔줌
 		setResize();
 	}	

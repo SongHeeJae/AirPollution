@@ -121,6 +121,7 @@ public class GraphDialog extends JDialog {
 		
 		double[] avg = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		int[] count = {0, 0, 0, 0, 0, 0}; // 누락데이터는 계산안함
+		double[] max= {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 		ArrayList<List<Double>> placeDatas = new ArrayList<>(); // 오염물질별 데이터
 		
@@ -139,13 +140,14 @@ public class GraphDialog extends JDialog {
 					while(days-- > 1)// 누락된 기간은 0으로 채워줌
 						for(int i=0; i<gp.length;i ++) placeDatas.get(i).add(0.0);
 				}
-				for(int i=0; i<gp.length; i++) {
+				for(int i=0; i<gp.length; i++)
 					if(d.getData(i+2).length() != 0) {
-						placeDatas.get(i).add(Double.parseDouble(d.getData(i+2)));
+						double val = Double.parseDouble(d.getData(i+2));
+						placeDatas.get(i).add(val);
 						count[i]++;
-						avg[i] += Double.parseDouble(d.getData(i+2));
+						avg[i] += val;
+						max[i] = val > max[i] ? val : max[i]; 
 					} else placeDatas.get(i).add(0.0);
-				}
 				date = d.getDate();
 			}			
 			int days = (int)((sdf.parse(end).getTime() - sdf.parse(date).getTime()) / (24*60*60*1000)); // 뒤에 남은 누락 기간들 0으로 채워줌
@@ -161,7 +163,7 @@ public class GraphDialog extends JDialog {
 
 		dtm.addRow(new Object[] {place, avg[0], avg[1], avg[2], avg[3], avg[4], avg[5]});
 
-		for(int i=0; i<gp.length; i++) gp[i].addLineGraph(place, placeDatas.get(i));
+		for(int i=0; i<gp.length; i++) gp[i].addLineGraph(place, placeDatas.get(i), max[i]);
 	}
 	
 	public void addBarGraph(String place){
