@@ -89,7 +89,7 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 
 	public abstract void setResize();
 	
-	public abstract void removeGraph(int pos);
+	public abstract void removeGraph(String place);
 	
 	public void reload() {
 		revalidate();

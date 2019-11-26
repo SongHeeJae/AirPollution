@@ -93,7 +93,7 @@ public class GraphDialog extends JDialog {
 			@Override
 			public void keyPressed(KeyEvent arg0) { // Del키 누르면 선택된 테이블 삭제
 				if(arg0.getKeyCode() == KeyEvent.VK_DELETE && table.getSelectedRow() != -1) {
-					for(GraphPanel g : gp) g.removeGraph(table.getSelectedRow());
+					for(GraphPanel g : gp) g.removeGraph((String)table.getValueAt(table.getSelectedRow(), 0));
 					dtm.removeRow(table.getSelectedRow());
 				}
 			}

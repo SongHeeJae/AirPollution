@@ -35,7 +35,14 @@ public class BarGraphPanel extends GraphPanel {
 	}
 	
 	
-	public void removeGraph(int pos) {
+	public void removeGraph(String place) {
+		int pos = -1;
+		for (int i=0; i<places.size(); i++)
+			if(places.get(i).equals(place)) {
+				pos = i;
+				break;
+			}
+		
 		datas.remove(pos);
 		places.remove(pos);
 		setResize();

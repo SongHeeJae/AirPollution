@@ -66,7 +66,13 @@ public class LineGraphPanel extends GraphPanel{
 		reload();
 	}
 	
-	public void removeGraph(int pos) {
+	public void removeGraph(String place) {
+		int pos = -1;
+		for (int i=0; i<places.size(); i++)
+			if(places.get(i).equals(place)) {
+				pos = i;
+				break;
+			}
 		int i = pos * datas.size()/places.size(), j = datas.size()/places.size();
 		while(j-- > 0) datas.remove(i);
 		places.remove(pos);
