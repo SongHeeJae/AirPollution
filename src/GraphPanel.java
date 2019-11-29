@@ -43,12 +43,10 @@ public abstract class GraphPanel extends JPanel implements MouseMotionListener{
 		if(pol < 2) g.drawString("(§¶/§©)", 5, 20);
 		else g.drawString("(ppm)", 5, 20); // ´ÜÀ§ ±×·ÁÁÜ
 		
-		if(!places.isEmpty()) { // ¼¼·ÎÃà ´ÜÀ§º°·Î 10Ä­ ³ª´²ÁÜ
+		if(!places.isEmpty()) // ¼¼·ÎÃà ´ÜÀ§º°·Î 10Ä­ ³ª´²ÁÜ
 			for(int i=0; i<11; i++)
 				g.drawString(String.format("%.3f", max/10*(10-i)), 5, 50+(55*i)); // ¶óÀÎ ³ôÀÌ 550
-			if(50 <= x && x <= (int)getPreferredSize().getWidth() && 40 <= y && y <= 590)
-				g.drawLine(x,40,x, 590);
-		}
+		
 	}
 	
 	public void addBarGraph(String place, double value) {

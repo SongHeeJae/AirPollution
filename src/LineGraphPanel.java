@@ -28,6 +28,8 @@ public class LineGraphPanel extends GraphPanel{
 				g.drawString(places.get(i) + " - " + Double.toString(datas.get((x/100-1) + datas.size()/places.size()*i)), x+5, y-10);
 			} // 마우스의 x좌표가 그래프의 x좌표에 닿았을때의 처리
 		
+		if(50 <= x && x <= (int)getPreferredSize().getWidth() && 40 <= y && y <= 590)
+			g.drawLine(x,40,x, 590);
 		
 		((Graphics2D)g).setStroke(new BasicStroke(2));
 		for(int i=0; i<places.size(); i++) { // 꺾은선 그래프 그리기
@@ -58,11 +60,13 @@ public class LineGraphPanel extends GraphPanel{
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 	public void setResize() {
 		if(!datas.isEmpty() && datas.size()/places.size() * 100 + 50 > getPreferredSize().getWidth())
 			setPreferredSize(new Dimension(datas.size()/places.size() * 100 + 100, 650));
+		else setPreferredSize(new Dimension(950, 650));
 		reload();
 	}
 	
