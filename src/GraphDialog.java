@@ -108,6 +108,10 @@ public class GraphDialog extends JDialog {
 	
 		add(pane);
 		
+		if(gp[0] instanceof BarGraphPanel)
+			for (String p : datas.keySet()) addBarGraph(p);
+		
+		
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}

@@ -30,7 +30,7 @@ public class BarGraphPanel extends GraphPanel {
 	
 	public void setResize() {
 		if(datas.size() * 125 + 50 > getPreferredSize().getWidth())
-			setPreferredSize(new Dimension((int)getPreferredSize().getWidth() + 125, 650));
+			setPreferredSize(new Dimension((int)getPreferredSize().getWidth() + 100, 650));
 		reload();
 	}
 	

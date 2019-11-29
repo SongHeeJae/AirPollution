@@ -328,10 +328,6 @@ public class Main extends JFrame {
 			int pk = Request.insertData(new String[] {dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()}, datas.getName());
 			if(pk != -1) {
 				int index = binarySearchDate(datas.getDatas(), dateText.getText(), true);
-			//	index = datas.getDatas().get(index).getDate().compareTo(dateText.getText()) > 0 ? index + 1 : index;
-				System.out.println("이전 : " + datas.getDatas().get(index-1).getDate());
-				System.out.println("현재 : " + datas.getDatas().get(index).getDate());
-				System.out.println("다음 : " + datas.getDatas().get(index+1).getDate());
 				
 				datas.getDatas().add(index, new Data(pk, dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()));
 				

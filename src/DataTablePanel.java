@@ -110,13 +110,10 @@ public class DataTablePanel extends JPanel {
 	}
 	
 	public void placeFilter() {
-		
 		dtm.setNumRows(0);
-		
 		for(int i = 1; i<boxList.size(); i++)
 			if(boxList.get(i).isSelected())
 				for(Data d : datas.get(boxList.get(i).getText())) dtm.addRow(d.getDatas());
-		
 		updateCount();
 	}
 	
