@@ -59,7 +59,78 @@ public class Request {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static int insertData(String[] data, String name) {
+		ResultSet rs = null;
+		int pk = -1;
+		StringBuilder sql = new StringBuilder();
+		sql.append("INSERT INTO ").append(name).append(" (`date`, `place`, `nitrogen`, `ozone`, `carbon`, `gas`, `dust`, `ultradust`) VALUES ('").append(data[0]).append("' ");
+		for(int i=1; i < data.length; i++) sql.append(", '").append(data[i]).append("'");
+		sql.append(");");
 		
+		try (Connection conn=getConnection();
+				Statement stmt = conn.createStatement();) {
+			stmt.executeUpdate(sql.toString(), Statement.RETURN_GENERATED_KEYS);
+			rs = stmt.getGeneratedKeys();
+			if(rs.next()) pk = Integer.parseInt(rs.getString(1));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return pk;
+	}
+	
+	public static void deleteData(int pk, String name) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("DELETE FROM ").append(name).append(" WHERE id=").append(pk).append(";");
+		try (Connection conn=getConnection();
+				Statement stmt = conn.createStatement();) {
+			stmt.executeUpdate(sql.toString());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void updateData(int pk, String name, String val, int col) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("UPDATE ").append(name).append(" SET ");
+		switch(col) {
+		case 0:
+			sql.append("`date`='"); break;
+		case 1:
+			sql.append("`place`='"); break;
+		case 2:
+			sql.append("`nitrogen`='"); break;
+		case 3:
+			sql.append("`ozone`='"); break;
+		case 4:
+			sql.append("`carbon`='"); break;
+		case 5:
+			sql.append("`gas`='"); break;
+		case 6:
+			sql.append("`dust`='"); break;
+		default:
+			sql.append("`ultradust`='");
+		}
+		sql.append(val).append("' WHERE `id`=").append(pk).append(";");
+		try (Connection conn=getConnection();
+				Statement stmt = conn.createStatement();) {
+			stmt.executeUpdate(sql.toString());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static Connection getConnection() throws ClassNotFoundException, SQLException {
@@ -82,7 +153,8 @@ public class Request {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sb.toString());) {
 			while(rs.next()) {
-				datas.add(new Data(rs.getString(2),
+				datas.add(new Data(Integer.parseInt(rs.getString(1)),
+						rs.getString(2),
 						rs.getString(3),
 						rs.getString(4),
 						rs.getString(5),

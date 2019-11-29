@@ -3,13 +3,19 @@ import java.util.List;
 import java.util.Map;
 
 class Data {
+	private int id;
 	private String[] datas;
-	public Data(String date, String place, String nitrogen, String ozone, String carbon, String gas, String dust, String ultraDust) {
+	public Data(int id, String date, String place, String nitrogen, String ozone, String carbon, String gas, String dust, String ultraDust) {
+		this.id = id;
 		datas = new String[] {date, place, nitrogen, ozone, carbon, gas, dust, ultraDust};
 	}
 	
 	public String getData(int pos) {
 		return datas[pos];
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	public String getDate() {
@@ -46,6 +52,11 @@ class Data {
 	public String[] getDatas() {
 		return datas;
 	}
+	
+	public void setData(int pos, String val) {
+		datas[pos] = val;
+	}
+	
 }
 
 
@@ -62,6 +73,13 @@ public class Datas {
 		this.end = end;
 	}
 	
+	public void setStart(String start) {
+		this.start = start;
+	}
+	
+	public void setEnd(String end) {
+		this.end = end;
+	}
 	
 	public String getName() {
 		return name;

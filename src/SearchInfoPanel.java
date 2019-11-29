@@ -18,14 +18,9 @@ import javax.swing.SpinnerDateModel;
 public class SearchInfoPanel extends JPanel {
 
 	private ButtonGroup radioGroup;
-	private JLabel duration;
 	public SearchInfoPanel(Main frame) {
-		setPreferredSize(new Dimension(300, 800));
+		setPreferredSize(new Dimension(260, 800));
 		setLayout(new FlowLayout());
-		
-		duration = new JLabel();
-		duration.setText("전체 조회");
-		add(duration);
 		
 		JSpinner dateStartSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
 		JSpinner dateEndSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_MONTH));
@@ -41,11 +36,10 @@ public class SearchInfoPanel extends JPanel {
 				JOptionPane.showMessageDialog(null, "데이터를 열어주세요.");
 				return;
 			}
-			frame.init(); //((Driver)getParent().getParent().getParent().getParent()).init(); 로 쓸수도 있음
+			frame.init();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			String start = sdf.format(dateStartSpinner.getValue());
 			String end = sdf.format(dateEndSpinner.getValue());
-			duration.setText(start + " ~ " + end);
 			frame.setDatas(Request.openData(frame.getTableName(), start, end));
 		});
 		add(dateSearch);
@@ -65,6 +59,5 @@ public class SearchInfoPanel extends JPanel {
 	
 	public void init() { // 검색옵션 상태 초기화
 		radioGroup.clearSelection();
-		duration.setText("전체 조회");
 	}
 }

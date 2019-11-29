@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -22,23 +23,22 @@ public class DataTablePanel extends JPanel {
 	private Map<String, List<Data>> datas;
 	private List<JCheckBox> boxList;
 	private boolean chk = true; // 체크박스리스너. placeFilter 메소드 여러번 실행안하게함
-
+	private JPanel placesList; // 지역 목록 패널
+	private JTable table;
 	public DataTablePanel(Map<String, List<Data>> datas) {
 		setLayout(new FlowLayout());
 		setPreferredSize(new Dimension(1000, 900));
-		JTable table = new JTable();
+		table = new JTable();
 		count = new JLabel();
 		boxList = new ArrayList<>();
 		this.datas = datas;
 
 		String[] header = {"측정일시", "측정소명" ,"이산화질소농도(ppm)" , "오존농도(ppm)" , "이산화탄소농도(ppm)" , "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"}; 
 
-		dtm = new DefaultTableModel(header, 0) {
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
+		dtm = new DefaultTableModel(header, 0);
+		
 		table.setModel(dtm);
+		table.setEnabled(false);
 		
 		TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(dtm);
 
@@ -52,6 +52,7 @@ public class DataTablePanel extends JPanel {
 
 		for(int i=2; i<header.length; i++) sorter.setComparator(i, sorter.getComparator(0));
 		table.setRowSorter(sorter);
+		
 		table.setAutoCreateRowSorter(false);
 		
 		JScrollPane pane = new JScrollPane(table);
@@ -60,7 +61,14 @@ public class DataTablePanel extends JPanel {
 		add(pane);
 		add(count);
 		
+
+		placesList = new JPanel(); // 지역들 필터 할수있는 목록
+		
 		initPlaceList();
+		
+		JScrollPane pane2 = new JScrollPane(placesList);
+		pane2.setPreferredSize(new Dimension(1000, 50));
+		add(pane2);
 		
 		placeFilter();
 	}
@@ -70,7 +78,9 @@ public class DataTablePanel extends JPanel {
 	}
 	
 	public void initPlaceList() {
-		JPanel placesList = new JPanel(); // 지역들 필터 할수있는 목록
+		
+		placesList.removeAll();
+		boxList.clear();
 		List<String> list = new ArrayList<>(datas.keySet());
 		Collections.sort(list);
 		ItemListener listener = e-> {
@@ -91,19 +101,38 @@ public class DataTablePanel extends JPanel {
 			boxList.get(boxList.size()-1).addItemListener(listener);
 			placesList.add(boxList.get(boxList.size()-1));
 		}
-		JScrollPane pane = new JScrollPane(placesList);
-		pane.setPreferredSize(new Dimension(1000, 50));
-		add(pane);
 		
+		updateCount();
+	}
+	
+	public void updateCount() {
 		count.setText("조회수 : " + dtm.getRowCount());
 	}
 	
 	public void placeFilter() {
+		
 		dtm.setNumRows(0);
+		
 		for(int i = 1; i<boxList.size(); i++)
 			if(boxList.get(i).isSelected())
 				for(Data d : datas.get(boxList.get(i).getText())) dtm.addRow(d.getDatas());
-		count.setText("조회수 : " + dtm.getRowCount());
+		
+		updateCount();
+	}
+	
+	public JTable getTable() {
+		return table;
+	}
+	
+	public DefaultTableModel getTableModel() {
+		return dtm;
+	}
+	
+	public int getRealIndex(int index, String place) {
+		for (int i=1; i<boxList.size() && !boxList.get(i).getText().equals(place); i++) 
+			if(boxList.get(i).isSelected()) 
+				index += datas.get(boxList.get(i).getText()).size();
+		return index;
 	}
 }
 

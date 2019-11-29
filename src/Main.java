@@ -4,13 +4,12 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -22,7 +21,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 public class Main extends JFrame {
 
@@ -30,9 +31,12 @@ public class Main extends JFrame {
 	private JTabbedPane tab;
 	private SearchInfoPanel sip;
 	private JLabel tableName;
+	private JButton insertData;
+	private JButton deleteData;
+
 	public Main() {
 		setTitle("대기오염도 분석 프로그램");
-		setSize(1500, 1000);
+		setSize(1450, 1000);
 		setLayout(new FlowLayout());
 		createMenu();
 		
@@ -45,6 +49,17 @@ public class Main extends JFrame {
 		add(new JLabel("열린 파일 : "));
 		add(tableName);
 		add(sip);
+		
+		insertData = new JButton("추가");
+		deleteData = new JButton("삭제");
+		insertData.setVisible(false);
+		deleteData.setVisible(false);
+		
+		insertData.addActionListener(e -> insertButton());
+		deleteData.addActionListener(e -> deleteButton());
+		
+		add(insertData);
+		add(deleteData);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -59,6 +74,7 @@ public class Main extends JFrame {
 	}
 	
 	public void setDatas(Datas datas) { // 열기로 가져온 데이터 지정. 초기에는 전체 탭에 담아줌
+		sip.init();
 		tab.removeAll();
 		this.datas = datas;
 		List<Data> list = datas.getDatas();
@@ -68,11 +84,13 @@ public class Main extends JFrame {
 			m.get(data.getPlace()).add(data);
 		}
 		tab.addTab("전체", new DataTablePanel(m));
+		((DataTablePanel)tab.getComponentAt(0)).getTable().setEnabled(true);
+		((DataTablePanel)tab.getComponentAt(0)).getTableModel().addTableModelListener(e ->update(e.getFirstRow(), e.getColumn()));
 	}
 	
 	public void setTableDatas(String duration) { // 년, 월 라디오버튼 선택했을 때의 이벤트 처리
 		
-		for(int i=tab.getTabCount() -1 ; i>0; i--) tab.remove(i);
+		removeTab();
 
 		List<Data> list = datas.getDatas();
 		Map<String, List<Data>> m = new HashMap<>();
@@ -130,6 +148,8 @@ public class Main extends JFrame {
 					saveServerToFile(); // 파일 -> 서버 저장만 구현
 					break;
 				case "초기화":
+					insertData.setVisible(false);
+					deleteData.setVisible(false);
 					tableName.setText("");
 					tab.removeAll();
 					init();
@@ -180,8 +200,9 @@ public class Main extends JFrame {
 			if(value == null) return;
 			dialog.dispose();
 			setDatas(Request.openData(value, null, null));
-			sip.init();
 			setTableDatas("전체");
+			insertData.setVisible(true);
+			deleteData.setVisible(true);
 			tableName.setText(datas.getName());
 		}); // 확인시 이벤트 처리
 		cancel.addActionListener(e -> dialog.dispose()); // 취소시 종료
@@ -252,6 +273,193 @@ public class Main extends JFrame {
 		String name = JOptionPane.showInputDialog("데이터 이름을 지정해주세요.");
 		
 		Request.inputData(path, name);
+	}
+	
+	public void insertButton() {
+		JDialog dialog = new JDialog();
+		dialog.setModal(true);
+		dialog.setSize(300, 550);
+		dialog.setLayout(new FlowLayout());
+		JLabel date = new JLabel("측정일시");
+		JTextField dateText = new JTextField(20);
+		JLabel place = new JLabel("측정소명");
+		JTextField placeText = new JTextField(20);
+		JLabel nitrogen = new JLabel("이산화질소농도(ppm)");
+		JTextField nitrogenText = new JTextField(20);
+		JLabel ozone = new JLabel("오존농도(ppm)");
+		JTextField ozoneText = new JTextField(20);
+		JLabel carbon = new JLabel("이산화탄소농도(ppm)");
+		JTextField carbonText = new JTextField(20);
+		JLabel gas = new JLabel("아황산가스(ppm)");
+		JTextField gasText = new JTextField(20);
+		JLabel dust = new JLabel("미세먼지(㎍/㎥)");
+		JTextField dustText = new JTextField(20);
+		JLabel ultraDust = new JLabel("초미세먼지(㎍/㎥)");
+		JTextField ultraDustText = new JTextField(20);
+		JButton submit = new JButton("확인");
+		submit.addActionListener(ee -> {
+			
+			if (dateText.getText().length() == 0 || placeText.getText().length() == 0 ||
+					nitrogenText.getText().length() == 0 || ozoneText.getText().length() == 0 ||
+					carbonText.getText().length() == 0 || gasText.getText().length() == 0 ||
+					dustText.getText().length() == 0 || ultraDustText.getText().length() == 0) {
+				JOptionPane.showMessageDialog(null, "데이터를 입력해주세요.");
+				return;
+			} else if(dateText.getText().length() != 8 || !isNum(dateText.getText())) {
+				JOptionPane.showMessageDialog(null, "날짜 형식이 올바르지 않습니다.");
+				return;
+			} else if (binarySearchDate(((DataTablePanel)tab.getComponentAt(0)).getDatas().get(placeText.getText()), dateText.getText(), false) != -1) {
+				JOptionPane.showMessageDialog(null, "각 날짜에 해당하는 장소 데이터는 하나만 입력 가능합니다.");
+				return;
+			} else {
+				try {
+					Double.parseDouble(nitrogenText.getText());
+					Double.parseDouble(ozoneText.getText());
+					Double.parseDouble(carbonText.getText());
+					Double.parseDouble(gasText.getText());
+					Double.parseDouble(dustText.getText());
+					Double.parseDouble(ultraDustText.getText());
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "오염물질 데이터 형식이 올바르지 않습니다.");
+					return;
+				}
+			}
+			
+			int pk = Request.insertData(new String[] {dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()}, datas.getName());
+			if(pk != -1) {
+				int index = binarySearchDate(datas.getDatas(), dateText.getText(), true);
+			//	index = datas.getDatas().get(index).getDate().compareTo(dateText.getText()) > 0 ? index + 1 : index;
+				System.out.println("이전 : " + datas.getDatas().get(index-1).getDate());
+				System.out.println("현재 : " + datas.getDatas().get(index).getDate());
+				System.out.println("다음 : " + datas.getDatas().get(index+1).getDate());
+				
+				datas.getDatas().add(index, new Data(pk, dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()));
+				
+				datas.setStart(datas.getDatas().get(0).getDate());
+				datas.setEnd(datas.getDatas().get(datas.getDatas().size()-1).getDate());
+				setDatas(datas);
+			} else JOptionPane.showMessageDialog(null, "데이터 추가 실패");
+		});
+		dialog.add(date);
+		dialog.add(dateText);
+		dialog.add(place);
+		dialog.add(placeText);
+		dialog.add(nitrogen);
+		dialog.add(nitrogenText);
+		dialog.add(ozone);
+		dialog.add(ozoneText);
+		dialog.add(carbon);
+		dialog.add(carbonText);
+		dialog.add(gas);
+		dialog.add(gasText);
+		dialog.add(dust);
+		dialog.add(dustText);
+		dialog.add(ultraDust);
+		dialog.add(ultraDustText);
+		dialog.add(submit);
+		
+		dialog.setVisible(true);
+	}
+	
+	public void deleteButton() {
+		
+		DataTablePanel t = (DataTablePanel)tab.getSelectedComponent();
+		
+		if (tab.getSelectedIndex() != 0 ) {
+			JOptionPane.showMessageDialog(null, "삭제는 전체 탭에서 진행 가능합니다.");
+			return;
+		} else if (t.getTable().getSelectedRow() == -1) {
+			JOptionPane.showMessageDialog(null, "선택된 데이터가 없습니다.");
+			return;
+		}
+
+		int pk = -1;
+		
+		String place = (String)t.getTable().getValueAt(t.getTable().getSelectedRow(), 1);
+		String date = (String)t.getTable().getValueAt(t.getTable().getSelectedRow(), 0);
+		
+		List<Data> d = t.getDatas().get(place);
+		int index = binarySearchDate(d, date, false); // 탭의 데이터에서 삭제
+		if(index == -1) return;
+		pk = d.get(index).getId();
+		d.remove(index);
+		
+		t.getTableModel().removeRow(t.getRealIndex(index, place));
+		t.updateCount();
+		
+		index = binarySearchDate(datas.getDatas(), date, false);
+		if(index == -1) return;
+		
+		int l=index, r=index+1; // 왼쪽으로 감소, 오른쪽으로 증가 변수. 본래 데이터에서 삭제하기 위해 pk 찾음
+		while(l>=0 && datas.getDatas().get(l).getId() != pk && datas.getDatas().get(l--).getDate().compareTo(date) < 0);
+		if (datas.getDatas().get(l).getId() == pk) datas.getDatas().remove(l);
+		else {
+			while(r < datas.getDatas().size() && datas.getDatas().get(r).getId() != pk && datas.getDatas().get(r++).getDate().compareTo(date) > 0);
+			datas.getDatas().remove(r);
+		}
+		
+		if(!datas.getDatas().isEmpty()) { // 기간의 시작날짜, 끝날짜 재조정
+			datas.setStart(datas.getDatas().get(0).getDate());
+			datas.setEnd(datas.getDatas().get(datas.getDatas().size()-1).getDate());
+		}
+		Request.deleteData(pk, datas.getName());
+		removeTab();
+		sip.init();
+	}
+	
+	public void update(int row, int col) {
+		
+		DataTablePanel t = (DataTablePanel)tab.getComponentAt(0);
+		
+		if(col == -1) return;
+		else if (col > 1)
+			try {
+				Double.parseDouble(((String)t.getTableModel().getValueAt(row, col)));
+			} catch(Exception e) {
+				JOptionPane.showMessageDialog(null, "올바른 숫자 데이터를 입력해주세요. 잘못된 데이터는 저장되지 않습니다.");
+				return;
+			}
+		else if(col == 0 && ((String)t.getTableModel().getValueAt(row, col)).length() != 8) {
+			JOptionPane.showMessageDialog(null, "측정일시를 올바르게 입력해주세요. 잘못된 데이터는 저장되지 않습니다.");
+			return;
+		}
+
+		List<Data> d = t.getDatas().get(t.getTableModel().getValueAt(row, 1));
+		int index = binarySearchDate(d, (String)t.getTableModel().getValueAt(row, 0), false);
+		if(index == -1) return;
+		
+		int pk = d.get(index).getId();
+		String val = (String)t.getTableModel().getValueAt(row, col);
+		d.get(index).setData(col, val);
+		Request.updateData(pk, datas.getName(), val, col);
+		removeTab();
+		sip.init();
+	}
+	
+	public int binarySearchDate(List<Data> d, String date, boolean flag) {
+		//flag가 false면 실패 시 -1 반환, true면 실패 시 그 위치 반환.
+		if(d == null || d.isEmpty()) return -1;
+		
+		int l = 0;
+		int r = d.size() - 1;
+		int mid = -1;
+		while(l<=r) { 
+			mid = (l+r)/2;
+			if(d.get(mid).getDate().compareTo(date) < 0) l = mid+1;
+			else if(d.get(mid).getDate().compareTo(date) > 0) r = mid-1;
+			else return mid;
+		}
+		return flag ? mid : -1;
+	}
+	
+	public boolean isNum(String text) {
+		for (char c : text.toCharArray())
+			if('0' > c || c > '9') return false;
+		return true;
+	}
+	
+	public void removeTab() { // 전체 탭 제외하고 삭제
+		for(int i=tab.getTabCount() -1 ; i>0; i--) tab.remove(i);
 	}
 	
 	public static void main(String[] args) {
