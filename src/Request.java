@@ -105,10 +105,6 @@ public class Request {
 		StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE ").append(name).append(" SET ");
 		switch(col) {
-		case 0:
-			sql.append("`date`='"); break;
-		case 1:
-			sql.append("`place`='"); break;
 		case 2:
 			sql.append("`nitrogen`='"); break;
 		case 3:

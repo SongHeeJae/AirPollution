@@ -12,7 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -35,7 +34,12 @@ public class DataTablePanel extends JPanel {
 
 		String[] header = {"측정일시", "측정소명" ,"이산화질소농도(ppm)" , "오존농도(ppm)" , "이산화탄소농도(ppm)" , "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"}; 
 
-		dtm = new DefaultTableModel(header, 0);
+		dtm = new DefaultTableModel(header, 0) {
+			public boolean isCellEditable(int r, int c) {
+				if(c == 0 || c == 1) return false;
+				return true;
+			}
+		};
 		
 		table.setModel(dtm);
 		table.setEnabled(false);
@@ -49,10 +53,8 @@ public class DataTablePanel extends JPanel {
 			else if (xx-yy < 0) return -1;
 			else return 0;
 		});
-
-		for(int i=2; i<header.length; i++) sorter.setComparator(i, sorter.getComparator(0));
-		table.setRowSorter(sorter);
 		
+		table.setRowSorter(sorter);
 		table.setAutoCreateRowSorter(false);
 		
 		JScrollPane pane = new JScrollPane(table);
@@ -111,9 +113,16 @@ public class DataTablePanel extends JPanel {
 	
 	public void placeFilter() {
 		dtm.setNumRows(0);
+		
+		TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(dtm);
+		sorter.setComparator(0, ((TableRowSorter<DefaultTableModel>)table.getRowSorter()).getComparator(0));
+		for(int i=2; i<8; i++) sorter.setComparator(i, sorter.getComparator(0));
+		table.setRowSorter(sorter); // 정렬 상태라면 addRow할 때 정렬하면서 들어가기때문에 속도 느려져서 초기화 해줌
+		
 		for(int i = 1; i<boxList.size(); i++)
 			if(boxList.get(i).isSelected())
 				for(Data d : datas.get(boxList.get(i).getText())) dtm.addRow(d.getDatas());
+		
 		updateCount();
 	}
 	

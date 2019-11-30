@@ -328,7 +328,8 @@ public class Main extends JFrame {
 			int pk = Request.insertData(new String[] {dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()}, datas.getName());
 			if(pk != -1) {
 				int index = binarySearchDate(datas.getDatas(), dateText.getText(), true);
-				
+				index = dateText.getText().compareTo(datas.getDatas().get(index).getDate()) > 0 ? index + 1 : index; 
+
 				datas.getDatas().add(index, new Data(pk, dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()));
 				
 				datas.setStart(datas.getDatas().get(0).getDate());
@@ -399,6 +400,7 @@ public class Main extends JFrame {
 			datas.setEnd(datas.getDatas().get(datas.getDatas().size()-1).getDate());
 		}
 		Request.deleteData(pk, datas.getName());
+		t.getTable().clearSelection();
 		removeTab();
 		sip.init();
 	}
@@ -408,22 +410,18 @@ public class Main extends JFrame {
 		DataTablePanel t = (DataTablePanel)tab.getComponentAt(0);
 		
 		if(col == -1) return;
-		else if (col > 1)
+		else
 			try {
 				Double.parseDouble(((String)t.getTableModel().getValueAt(row, col)));
 			} catch(Exception e) {
 				JOptionPane.showMessageDialog(null, "올바른 숫자 데이터를 입력해주세요. 잘못된 데이터는 저장되지 않습니다.");
 				return;
 			}
-		else if(col == 0 && ((String)t.getTableModel().getValueAt(row, col)).length() != 8) {
-			JOptionPane.showMessageDialog(null, "측정일시를 올바르게 입력해주세요. 잘못된 데이터는 저장되지 않습니다.");
-			return;
-		}
 
 		List<Data> d = t.getDatas().get(t.getTableModel().getValueAt(row, 1));
 		int index = binarySearchDate(d, (String)t.getTableModel().getValueAt(row, 0), false);
-		if(index == -1) return;
 		
+		if(index == -1) return;
 		int pk = d.get(index).getId();
 		String val = (String)t.getTableModel().getValueAt(row, col);
 		d.get(index).setData(col, val);
