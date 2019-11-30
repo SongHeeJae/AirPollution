@@ -66,7 +66,7 @@ public class LineGraphPanel extends GraphPanel{
 	public void setResize() {
 		if(!datas.isEmpty() && datas.size()/places.size() * 100 + 50 > getPreferredSize().getWidth())
 			setPreferredSize(new Dimension(datas.size()/places.size() * 100 + 100, 650));
-		else setPreferredSize(new Dimension(950, 650));
+		else if (datas.isEmpty()) setPreferredSize(new Dimension(950, 650));
 		reload();
 	}
 	

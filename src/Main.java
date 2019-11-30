@@ -4,11 +4,12 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -23,7 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
 
 public class Main extends JFrame {
 
@@ -280,79 +280,56 @@ public class Main extends JFrame {
 		dialog.setModal(true);
 		dialog.setSize(300, 550);
 		dialog.setLayout(new FlowLayout());
-		JLabel date = new JLabel("측정일시");
-		JTextField dateText = new JTextField(20);
-		JLabel place = new JLabel("측정소명");
-		JTextField placeText = new JTextField(20);
-		JLabel nitrogen = new JLabel("이산화질소농도(ppm)");
-		JTextField nitrogenText = new JTextField(20);
-		JLabel ozone = new JLabel("오존농도(ppm)");
-		JTextField ozoneText = new JTextField(20);
-		JLabel carbon = new JLabel("이산화탄소농도(ppm)");
-		JTextField carbonText = new JTextField(20);
-		JLabel gas = new JLabel("아황산가스(ppm)");
-		JTextField gasText = new JTextField(20);
-		JLabel dust = new JLabel("미세먼지(㎍/㎥)");
-		JTextField dustText = new JTextField(20);
-		JLabel ultraDust = new JLabel("초미세먼지(㎍/㎥)");
-		JTextField ultraDustText = new JTextField(20);
+		
+		String[] text = new String[] {"측정일시", "측정소명", "이산화질소농도(ppm)", "오존농도(ppm)", "이산화탄소농도(ppm)", "아황산가스(ppm)", "미세먼지(㎍/㎥)", "초미세먼지(㎍/㎥)"};
+		JTextField[] textField = new JTextField[text.length];
+		for(int i=0; i<text.length; i++) {
+			JLabel lbl = new JLabel(text[i]);
+			textField[i] = new JTextField(20);
+			dialog.add(lbl);
+			dialog.add(textField[i]);
+		}
+		
 		JButton submit = new JButton("확인");
 		submit.addActionListener(ee -> {
-			
-			if (dateText.getText().length() == 0 || placeText.getText().length() == 0 ||
-					nitrogenText.getText().length() == 0 || ozoneText.getText().length() == 0 ||
-					carbonText.getText().length() == 0 || gasText.getText().length() == 0 ||
-					dustText.getText().length() == 0 || ultraDustText.getText().length() == 0) {
+			int c=0;
+			for(JTextField t : textField) c+=t.getText().length();
+			if (c == 0) {
 				JOptionPane.showMessageDialog(null, "데이터를 입력해주세요.");
 				return;
-			} else if(dateText.getText().length() != 8 || !isNum(dateText.getText())) {
+			} else if(textField[0].getText().length() != 8 || !isNum(textField[0].getText())) {
 				JOptionPane.showMessageDialog(null, "날짜 형식이 올바르지 않습니다.");
 				return;
-			} else if (binarySearchDate(((DataTablePanel)tab.getComponentAt(0)).getDatas().get(placeText.getText()), dateText.getText(), false) != -1) {
+			} else if (binarySearchDate(((DataTablePanel)tab.getComponentAt(0)).getDatas().get(textField[1].getText()), textField[0].getText(), false) != -1) {
 				JOptionPane.showMessageDialog(null, "각 날짜에 해당하는 장소 데이터는 하나만 입력 가능합니다.");
 				return;
 			} else {
 				try {
-					Double.parseDouble(nitrogenText.getText());
-					Double.parseDouble(ozoneText.getText());
-					Double.parseDouble(carbonText.getText());
-					Double.parseDouble(gasText.getText());
-					Double.parseDouble(dustText.getText());
-					Double.parseDouble(ultraDustText.getText());
+					Double.parseDouble(textField[2].getText());
+					Double.parseDouble(textField[3].getText());
+					Double.parseDouble(textField[4].getText());
+					Double.parseDouble(textField[5].getText());
+					Double.parseDouble(textField[6].getText());
+					Double.parseDouble(textField[7].getText());
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "오염물질 데이터 형식이 올바르지 않습니다.");
 					return;
 				}
 			}
 			
-			int pk = Request.insertData(new String[] {dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()}, datas.getName());
+			int pk = Request.insertData(new String[] {textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText(), textField[5].getText(), textField[6].getText(), textField[7].getText()}, datas.getName());
 			if(pk != -1) {
-				int index = binarySearchDate(datas.getDatas(), dateText.getText(), true);
-				index = dateText.getText().compareTo(datas.getDatas().get(index).getDate()) > 0 ? index + 1 : index; 
+				int index = binarySearchDate(datas.getDatas(), textField[0].getText(), true);
+				index = textField[0].getText().compareTo(datas.getDatas().get(index).getDate()) > 0 ? index + 1 : index; 
 
-				datas.getDatas().add(index, new Data(pk, dateText.getText(), placeText.getText(), nitrogenText.getText(), ozoneText.getText(), carbonText.getText(), gasText.getText(), dustText.getText(), ultraDustText.getText()));
+				datas.getDatas().add(index, new Data(pk, textField[0].getText(), textField[1].getText(), textField[2].getText(), textField[3].getText(), textField[4].getText(), textField[5].getText(), textField[6].getText(), textField[7].getText()));
 				
 				datas.setStart(datas.getDatas().get(0).getDate());
 				datas.setEnd(datas.getDatas().get(datas.getDatas().size()-1).getDate());
 				setDatas(datas);
 			} else JOptionPane.showMessageDialog(null, "데이터 추가 실패");
 		});
-		dialog.add(date);
-		dialog.add(dateText);
-		dialog.add(place);
-		dialog.add(placeText);
-		dialog.add(nitrogen);
-		dialog.add(nitrogenText);
-		dialog.add(ozone);
-		dialog.add(ozoneText);
-		dialog.add(carbon);
-		dialog.add(carbonText);
-		dialog.add(gas);
-		dialog.add(gasText);
-		dialog.add(dust);
-		dialog.add(dustText);
-		dialog.add(ultraDust);
-		dialog.add(ultraDustText);
+
 		dialog.add(submit);
 		
 		dialog.setVisible(true);
@@ -380,27 +357,31 @@ public class Main extends JFrame {
 		if(index == -1) return;
 		pk = d.get(index).getId();
 		d.remove(index);
-		
+
 		t.getTableModel().removeRow(t.getRealIndex(index, place));
 		t.updateCount();
 		
 		index = binarySearchDate(datas.getDatas(), date, false);
+		
 		if(index == -1) return;
 		
-		int l=index, r=index+1; // 왼쪽으로 감소, 오른쪽으로 증가 변수. 본래 데이터에서 삭제하기 위해 pk 찾음
-		while(l>=0 && datas.getDatas().get(l).getId() != pk && datas.getDatas().get(l--).getDate().compareTo(date) < 0);
-		if (datas.getDatas().get(l).getId() == pk) datas.getDatas().remove(l);
+		int l, r; // 왼쪽으로 감소, 오른쪽으로 증가 변수. 본래 데이터에서 삭제하기 위해 pk 찾음
+
+		for (l=index; l>0 && datas.getDatas().get(l).getId() != pk && datas.getDatas().get(l).getDate().compareTo(date) <= 0; l--);
+
+		if (datas.getDatas().get(l).getId() == pk) index = l;
 		else {
-			while(r < datas.getDatas().size() && datas.getDatas().get(r).getId() != pk && datas.getDatas().get(r++).getDate().compareTo(date) > 0);
-			datas.getDatas().remove(r);
+			for(r=index+1; r < datas.getDatas().size() && datas.getDatas().get(r).getId() != pk && datas.getDatas().get(r).getDate().compareTo(date) >= 0; r++);
+			index = r;
 		}
+		
+		datas.getDatas().remove(index);
 		
 		if(!datas.getDatas().isEmpty()) { // 기간의 시작날짜, 끝날짜 재조정
 			datas.setStart(datas.getDatas().get(0).getDate());
 			datas.setEnd(datas.getDatas().get(datas.getDatas().size()-1).getDate());
 		}
 		Request.deleteData(pk, datas.getName());
-		t.getTable().clearSelection();
 		removeTab();
 		sip.init();
 	}
@@ -458,6 +439,7 @@ public class Main extends JFrame {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		try { Request.getConnection(); } catch (Exception e) {} // 로컬이라그런지 첫 접속이 느려서 실행전에 접속한번하겠습니다
 		new Main();
 	}
 
